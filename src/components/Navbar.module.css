@@ -20,11 +20,12 @@
 
 .logo {
   font-family: var(--font-display);
-  font-size: 1.1rem;
-  font-weight: 800;
+  font-size: 0.85rem;
+  font-weight: 700;
   color: var(--foreground);
-  letter-spacing: -0.02em;
+  letter-spacing: 2px;
   text-transform: uppercase;
+  margin-right: 1.5rem; /* Ensure space from the next item */
 }
 
 .links {
@@ -36,9 +37,9 @@
 .link {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--foreground);
-  opacity: 0.5;
+  opacity: 0.6;
   letter-spacing: 2px;
   text-transform: uppercase;
   transition: all 0.3s ease;
