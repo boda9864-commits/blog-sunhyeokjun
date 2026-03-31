@@ -14,27 +14,20 @@
 
 .inner {
   display: flex;
-  justify-content: space-between;
+  justify-content: center; /* Center the whole menu for a cleaner editorial look */
   align-items: center;
-}
-
-.logo {
-  font-family: var(--font-display);
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--foreground);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-right: 1.5rem; /* Ensure space from the next item */
+  width: 100%;
 }
 
 .links {
   display: flex;
-  gap: 3rem;
+  gap: 3.5rem; /* Perfect identical gap between all words */
   list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-.link {
+.logo, .link {
   font-family: var(--font-display);
   font-weight: 500;
   font-size: 0.8rem;
@@ -44,14 +37,15 @@
   text-transform: uppercase;
   transition: all 0.3s ease;
   position: relative;
+  cursor: pointer;
 }
 
-.link:hover {
+.logo:hover, .link:hover {
   opacity: 1;
   color: var(--primary);
 }
 
-.link::after {
+.logo::after, .link::after {
   content: '';
   position: absolute;
   bottom: -4px;
@@ -62,6 +56,6 @@
   transition: width 0.3s ease;
 }
 
-.link:hover::after {
+.logo:hover::after, .link:hover::after {
   width: 100%;
 }
