@@ -15,6 +15,9 @@ export default function Navbar() {
             <Link href="/photos" className={styles.link}>PHOTOS</Link>
           </li>
           <li>
+            <Link href="/portfolio" className={styles.link}>PORTFOLIO</Link>
+          </li>
+          <li>
             <Link href="/about" className={styles.link}>ABOUT</Link>
           </li>
         </ul>
