@@ -64,7 +64,7 @@ export default function Home() {
                 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem' }}>
                   <Link href="/portfolio" className="btn-primary">
-                    EXPLORE WORKS
+                    PORTFOLIO
                   </Link>
                   <Link href="/photos" style={{ 
                     fontFamily: 'var(--font-display)',
