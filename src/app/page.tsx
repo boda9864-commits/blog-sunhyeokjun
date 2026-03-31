@@ -1,31 +1,54 @@
-import { getSortedPostsData } from '@/lib/posts';
-import PostCard from '@/components/PostCard';
+import Link from 'next/link';
 
 export default function Home() {
-  const allPostsData = getSortedPostsData();
-
   return (
-    <div className="fade-in">
-      <header style={{ marginBottom: '4rem', textAlign: 'center' }}>
-        <h1 style={{ fontSize: '3.5rem', marginBottom: '1rem', letterSpacing: '-1px' }}>
-          순혁준의 공간<span style={{ color: 'var(--primary)' }}>.</span>
-        </h1>
-        <p style={{ fontSize: '1.25rem', opacity: 0.7, maxWidth: '600px', margin: '0 auto' }}>
-          개인적인 생각과 코드, 그리고 일상의 기록들을 담는 디지털 정원입니다.
-        </p>
-      </header>
-
-      <section>
-        {allPostsData.map(({ slug, date, title, excerpt }) => (
-          <PostCard 
-            key={slug}
-            slug={slug}
-            date={date}
-            title={title}
-            excerpt={excerpt}
-          />
-        ))}
+    <main className="fade-in">
+      <section style={{ 
+        height: 'calc(100vh - 80px)', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        justifyContent: 'center',
+        padding: '0 0 10vh 0'
+      }}>
+        <h2 style={{ 
+          fontSize: 'clamp(3rem, 10vw, 8rem)', 
+          fontWeight: 800, 
+          lineHeight: 0.9, 
+          marginBottom: '2rem',
+          letterSpacing: '-0.05em' 
+        }}>
+          SUNHYEOK<br/>JUN<span style={{ color: 'var(--foreground-muted)' }}>.</span>
+        </h2>
+        <div style={{ maxWidth: '600px' }}>
+          <p style={{ 
+            fontSize: '1.25rem', 
+            color: 'var(--foreground-muted)', 
+            marginBottom: '3rem',
+            fontWeight: 400,
+            lineHeight: 1.6
+          }}>
+            시각적 기록과 코드, 그리고 일상의 조각들을 담아내는 공간입니다.<br/>
+            단순함의 미학과 본질적인 가치를 탐구합니다.
+          </p>
+          <div style={{ display: 'flex', gap: '1.5rem' }}>
+            <Link href="/photos" className="btn-primary">
+              VIEW PHOTOS
+            </Link>
+            <Link href="/about" style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              fontSize: '0.8rem', 
+              fontWeight: 700, 
+              letterSpacing: '2px',
+              textTransform: 'uppercase'
+            }}>
+              ABOUT ME →
+            </Link>
+          </div>
+        </div>
       </section>
-    </div>
+
+      {/* Featured visual element or minimal list can go here if needed later */}
+    </main>
   );
 }

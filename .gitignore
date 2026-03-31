@@ -39,3 +39,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# antigravity
+brain/
+browser_recordings/
+conversations/
+html_artifacts/
+knowledge/
+prompting/
+context_state/
+implicit/
+scratch/
+installation_id
+mcp_config.json

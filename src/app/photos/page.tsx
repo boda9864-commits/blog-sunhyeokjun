@@ -9,16 +9,11 @@ interface Photo {
   caption: string;
 }
 
-/**
- * 📸 사진 올리는 방법 안내:
- * 1. public/images/photos/ 폴더에 직접 찍은 사진 파일을 넣으세요.
- * 2. 아래의 'myPhotos' 배열에 { id: 1, url: '/images/photos/파일이름.jpg', caption: '설명' } 형식으로 추가하세요.
- */
 const myPhotos: Photo[] = [
   {
     id: 1,
     url: '/images/photos/651368940_910463718472319_6134888753375171182_n.jpg',
-    caption: '순혁준님이 직접 올리신 첫 번째 사진 📸'
+    caption: 'MOMENTS IN TIME'
   },
 ];
 
@@ -26,7 +21,6 @@ export default function PhotosPage() {
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const hasPhotos = myPhotos.length > 0;
 
-  // ESC 키로 모달 닫기 및 스크롤 방지
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setSelectedPhoto(null);
@@ -46,11 +40,11 @@ export default function PhotosPage() {
   }, [selectedPhoto]);
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} container`}>
       <header>
-        <h1 className={styles.title}>나의 사진 기록</h1>
+        <h1 className={styles.title}>VISUALS</h1>
         <p className={styles.subtitle}>
-          순혁준님이 직접 포착한 아름다운 순간들을 이곳에 담아보세요.
+          찰나의 포착, 그리고 기록.
         </p>
       </header>
 
@@ -59,7 +53,7 @@ export default function PhotosPage() {
           {myPhotos.map((photo) => (
             <div 
               key={photo.id} 
-              className={`${styles.photoCard} glass`}
+              className={styles.photoCard}
               onClick={() => setSelectedPhoto(photo)}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -71,29 +65,23 @@ export default function PhotosPage() {
           ))}
         </div>
       ) : (
-        <div className="glass" style={{ 
-          padding: '4rem', 
-          textAlign: 'center', 
-          borderRadius: '20px',
-          marginTop: '2rem' 
+        <div style={{ 
+          padding: '8rem 0', 
+          textAlign: 'center',
+          borderTop: '1px solid var(--glass-border)'
         }}>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📷</div>
-          <h2 style={{ marginBottom: '1rem' }}>아직 등록된 사진이 없어요!</h2>
-          <p style={{ opacity: 0.7, maxWidth: '400px', margin: '0 auto' }}>
-            순혁준님의 카메라에 담긴 특별한 순간들을 이곳에 가장 먼저 기록해 보세요.
+          <h2 style={{ marginBottom: '1rem', fontSize: '1rem', letterSpacing: '2px' }}>NO VISUALS YET</h2>
+          <p style={{ color: 'var(--foreground-muted)', fontSize: '0.9rem' }}>
+            첫 번째 기록을 기다리고 있습니다.
           </p>
-          <div style={{ marginTop: '2rem', padding: '1rem', background: 'var(--secondary)', borderRadius: '12px', fontSize: '0.9rem', color: '#2D3B2D' }}>
-            <strong>도움말:</strong> <code>src/app/photos/page.tsx</code> 파일에서 사진 정보를 입력하면 자동으로 나타납니다.
-          </div>
         </div>
       )}
 
-      {/* 🖼️ 라이트박스 모달 */}
       {selectedPhoto && (
         <div className={styles.modal} onClick={() => setSelectedPhoto(null)}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <button className={styles.closeButton} onClick={() => setSelectedPhoto(null)}>
-              &times;
+              CLOSE
             </button>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img 

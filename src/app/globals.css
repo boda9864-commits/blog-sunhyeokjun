@@ -1,17 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  --background: #FFF9FA;
-  --foreground: #3D2B2B;
-  --primary: #FFB7C5;
-  --primary-hover: #FF8FAB;
-  --secondary: #E6F3E6;
-  --secondary-hover: #D1E8D1;
-  --accent: #FFD1DC;
-  --card-bg: rgba(255, 255, 255, 0.8);
-  --glass-border: rgba(255, 183, 197, 0.2);
-  --selection: #FFB7C5;
-  --max-width: 800px;
+  --background: #050505;
+  --foreground: #FFFFFF;
+  --foreground-muted: #888888;
+  --primary: #FFFFFF;
+  --primary-hover: #EEEEEE;
+  --accent: #555555;
+  --card-bg: #0A0A0A;
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --max-width: 1100px;
 }
 
 * {
@@ -21,8 +19,8 @@
 }
 
 ::selection {
-  background: var(--selection);
-  color: white;
+  background: var(--foreground);
+  color: var(--background);
 }
 
 html,
@@ -30,118 +28,63 @@ body {
   max-width: 100vw;
   overflow-x: hidden;
   height: 100%;
-}
-
-body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Lora', serif;
-  line-height: 1.6;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Pretendard', sans-serif;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(255, 183, 197, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(230, 243, 230, 0.2) 0px, transparent 50%);
-  background-attachment: fixed;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Outfit', sans-serif;
-  color: #2D1B1B;
-  font-weight: 600;
-  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
 }
 
 a {
   color: inherit;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: opacity 0.2s ease;
+}
+
+a:hover {
+  opacity: 0.7;
 }
 
 .container {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 0 1.5rem;
-}
-
-.glass {
-  background: var(--card-bg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid var(--glass-border);
-  box-shadow: 0 8px 32px 0 rgba(255, 183, 197, 0.1);
+  padding: 0 2rem;
 }
 
 .btn-primary {
   display: inline-block;
-  padding: 0.6rem 1.2rem;
+  padding: 0.8rem 1.6rem;
   background: var(--primary);
-  color: white;
-  border-radius: 8px;
-  font-family: 'Outfit', sans-serif;
-  font-weight: 500;
+  color: var(--background);
+  border-radius: 4px;
+  font-weight: 600;
   cursor: pointer;
   border: none;
-  transition: transform 0.2s ease, background 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .btn-primary:hover {
-  background: var(--primary-hover);
   transform: translateY(-2px);
-}
-
-/* Markdown Content Styling */
-.prose {
-  max-width: 100%;
-  margin-top: 2rem;
-}
-
-.prose h1, .prose h2, .prose h3 {
-  margin-top: 2.5rem;
-  margin-bottom: 1rem;
-}
-
-.prose p {
-  margin-bottom: 1.5rem;
-  font-size: 1.15rem;
-  color: var(--foreground);
-}
-
-.prose ul, .prose ol {
-  margin-left: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.prose li {
-  margin-bottom: 0.5rem;
-}
-
-.prose blockquote {
-  border-left: 4px solid var(--primary);
-  padding-left: 1.5rem;
-  font-style: italic;
-  margin: 2rem 0;
-  opacity: 0.8;
-}
-
-.prose img {
-  max-width: 100%;
-  border-radius: 12px;
-  margin: 2rem 0;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  filter: invert(1);
 }
 
 /* Animations */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .fade-in {
-  animation: fadeIn 1s ease-out forwards;
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+/* Section Spacing */
+section {
+  padding: 6rem 0;
 }

@@ -7,29 +7,29 @@
 }
 
 .card:hover {
-  transform: translateY(-8px) scale(1.01);
-  box-shadow: 0 15px 45px 0 rgba(255, 183, 197, 0.2);
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6), 0 0 20px rgba(99, 102, 241, 0.2);
 }
 
 .date {
-  font-family: 'Outfit', sans-serif;
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
   color: var(--primary);
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 0.5rem;
+  letter-spacing: 1.5px;
+  margin-bottom: 0.75rem;
   display: block;
 }
 
 .title {
   font-size: 1.8rem;
   margin-bottom: 1rem;
-  color: #2D1B1B;
+  color: #F8FAFC;
 }
 
 .excerpt {
-  color: rgba(61, 43, 43, 0.8);
-  font-size: 1.1rem;
+  color: var(--foreground-muted);
+  font-size: 1.05rem;
   line-height: 1.7;
 }

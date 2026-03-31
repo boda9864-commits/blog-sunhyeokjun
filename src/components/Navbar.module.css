@@ -10,21 +10,29 @@
 
 .inner {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  gap: 2.5rem; /* Consistent gap between all items */
 }
 
-.logo {
-  font-family: 'Outfit', sans-serif;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--primary);
-  letter-spacing: -0.5px;
+.logo, .link {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem; /* Identical font size for all */
+  font-weight: 500; /* Identical weight */
+  color: var(--foreground);
+  opacity: 0.8;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.logo:hover, .link:hover {
+  opacity: 1;
 }
 
 .links {
   display: flex;
-  gap: 2rem;
+  gap: 2.5rem; /* Same gap as between logo and links */
   list-style: none;
 }
 
