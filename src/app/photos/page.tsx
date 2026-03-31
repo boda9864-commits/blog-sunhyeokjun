@@ -1,11 +1,20 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import styles from './Photos.module.css';
+
+interface Photo {
+  id: number;
+  url: string;
+  caption: string;
+}
 
 /**
  * 📸 사진 올리는 방법 안내:
  * 1. public/images/photos/ 폴더에 직접 찍은 사진 파일을 넣으세요.
  * 2. 아래의 'myPhotos' 배열에 { id: 1, url: '/images/photos/파일이름.jpg', caption: '설명' } 형식으로 추가하세요.
  */
-const myPhotos: { id: number; url: string; caption: string }[] = [
+const myPhotos: Photo[] = [
   {
     id: 1,
     url: '/images/photos/651368940_910463718472319_6134888753375171182_n.jpg',
@@ -14,7 +23,27 @@ const myPhotos: { id: number; url: string; caption: string }[] = [
 ];
 
 export default function PhotosPage() {
+  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const hasPhotos = myPhotos.length > 0;
+
+  // ESC 키로 모달 닫기 및 스크롤 방지
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedPhoto(null);
+    };
+    
+    if (selectedPhoto) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleEsc);
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    return () => {
+      window.removeEventListener('keydown', handleEsc);
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedPhoto]);
 
   return (
     <div className={styles.container}>
@@ -28,7 +57,11 @@ export default function PhotosPage() {
       {hasPhotos ? (
         <div className={styles.grid}>
           {myPhotos.map((photo) => (
-            <div key={photo.id} className={`${styles.photoCard} glass`}>
+            <div 
+              key={photo.id} 
+              className={`${styles.photoCard} glass`}
+              onClick={() => setSelectedPhoto(photo)}
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={photo.url} alt={photo.caption} className={styles.img} />
               <div className={styles.overlay}>
@@ -51,6 +84,24 @@ export default function PhotosPage() {
           </p>
           <div style={{ marginTop: '2rem', padding: '1rem', background: 'var(--secondary)', borderRadius: '12px', fontSize: '0.9rem', color: '#2D3B2D' }}>
             <strong>도움말:</strong> <code>src/app/photos/page.tsx</code> 파일에서 사진 정보를 입력하면 자동으로 나타납니다.
+          </div>
+        </div>
+      )}
+
+      {/* 🖼️ 라이트박스 모달 */}
+      {selectedPhoto && (
+        <div className={styles.modal} onClick={() => setSelectedPhoto(null)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.closeButton} onClick={() => setSelectedPhoto(null)}>
+              &times;
+            </button>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img 
+              src={selectedPhoto.url} 
+              alt={selectedPhoto.caption} 
+              className={styles.modalImg} 
+            />
+            <p className={styles.modalCaption}>{selectedPhoto.caption}</p>
           </div>
         </div>
       )}
