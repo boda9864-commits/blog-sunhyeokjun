@@ -1,15 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  --background: #050505;
-  --foreground: #FFFFFF;
+  --background: #080808;
+  --foreground: #F5F5F5;
   --foreground-muted: #888888;
   --primary: #FFFFFF;
-  --primary-hover: #EEEEEE;
-  --accent: #555555;
-  --card-bg: #0A0A0A;
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --max-width: 1100px;
+  --primary-hover: #EBEBEB;
+  --accent: #222222;
+  --card-bg: #111111;
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --max-width: 1200px;
+  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Pretendard', sans-serif;
+  --font-display: 'Outfit', 'Inter', sans-serif;
 }
 
 * {
@@ -30,61 +32,68 @@ body {
   height: 100%;
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Pretendard', sans-serif;
-  line-height: 1.5;
+  font-family: var(--font-main);
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
   font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1.1;
+  letter-spacing: -0.045em;
+  line-height: 1;
 }
 
 a {
   color: inherit;
   text-decoration: none;
-  transition: opacity 0.2s ease;
-}
-
-a:hover {
-  opacity: 0.7;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .container {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 3rem;
 }
 
 .btn-primary {
   display: inline-block;
-  padding: 0.8rem 1.6rem;
+  padding: 1rem 2rem;
   background: var(--primary);
   color: var(--background);
-  border-radius: 4px;
+  border-radius: 2px;
   font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
   cursor: pointer;
   border: none;
-  transition: all 0.2s ease;
+  text-transform: uppercase;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  filter: invert(1);
+  background: var(--foreground);
+  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1);
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+/* Base Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .fade-in {
-  animation: fadeIn 0.8s ease-out forwards;
+  animation: fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Section Spacing */
 section {
-  padding: 6rem 0;
+  padding: 8rem 0;
+}
+
+/* Utility for glass effect */
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
 }
