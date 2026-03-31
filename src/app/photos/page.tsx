@@ -5,34 +5,31 @@ import styles from './Photos.module.css';
 
 interface Photo {
   id: number;
+  filename: string;
   url: string;
   caption: string;
 }
 
-const myPhotos: Photo[] = [
-  {
-    id: 1,
-    url: '/images/photos/651368940_910463718472319_6134888753375171182_n.jpg',
-    caption: 'MOMENTS IN TIME'
-  },
-];
-
 export default function PhotosPage() {
+  const [photos, setPhotos] = useState<Photo[]>([]);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
-  const hasPhotos = myPhotos.length > 0;
+
+  useEffect(() => {
+    fetch('/api/photos')
+      .then((res) => res.json())
+      .then((data) => setPhotos(data));
+  }, []);
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setSelectedPhoto(null);
     };
-    
     if (selectedPhoto) {
       document.body.style.overflow = 'hidden';
       window.addEventListener('keydown', handleEsc);
     } else {
       document.body.style.overflow = 'unset';
     }
-    
     return () => {
       window.removeEventListener('keydown', handleEsc);
       document.body.style.overflow = 'unset';
@@ -42,33 +39,31 @@ export default function PhotosPage() {
   return (
     <div className={`${styles.container} container`}>
       <header>
-        <h1 className={styles.title}>VISUALS</h1>
-        <p className={styles.subtitle}>
-          찰나의 포착, 그리고 기록.
-        </p>
+        <h1 className={styles.title}>PHOTOS</h1>
+        <p className={styles.subtitle}>이곳은 제가 찍은 사진을 올리는 곳입니다.</p>
       </header>
 
-      {hasPhotos ? (
+      {photos.length > 0 ? (
         <div className={styles.grid}>
-          {myPhotos.map((photo) => (
-            <div 
-              key={photo.id} 
+          {photos.map((photo) => (
+            <div
+              key={photo.id}
               className={styles.photoCard}
               onClick={() => setSelectedPhoto(photo)}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={photo.url} alt={photo.caption} className={styles.img} />
               <div className={styles.overlay}>
-                <p className={styles.caption}>{photo.caption}</p>
+                <p className={styles.caption}>{photo.caption || '(설명 없음)'}</p>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <div style={{ 
-          padding: '8rem 0', 
+        <div style={{
+          padding: '8rem 0',
           textAlign: 'center',
-          borderTop: '1px solid var(--glass-border)'
+          borderTop: '1px solid var(--glass-border)',
         }}>
           <h2 style={{ marginBottom: '1rem', fontSize: '1rem', letterSpacing: '2px' }}>NO VISUALS YET</h2>
           <p style={{ color: 'var(--foreground-muted)', fontSize: '0.9rem' }}>
@@ -84,12 +79,22 @@ export default function PhotosPage() {
               CLOSE
             </button>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img 
-              src={selectedPhoto.url} 
-              alt={selectedPhoto.caption} 
-              className={styles.modalImg} 
+            <img
+              src={selectedPhoto.url}
+              alt={selectedPhoto.caption}
+              className={styles.modalImg}
             />
-            <p className={styles.modalCaption}>{selectedPhoto.caption}</p>
+            {selectedPhoto.caption && (
+              <p style={{
+                textAlign: 'center',
+                marginTop: '1rem',
+                fontSize: '0.75rem',
+                letterSpacing: '3px',
+                color: 'var(--foreground-muted)',
+              }}>
+                {selectedPhoto.caption}
+              </p>
+            )}
           </div>
         </div>
       )}

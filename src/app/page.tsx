@@ -32,7 +32,7 @@ export default function Home() {
               textTransform: 'uppercase',
               marginBottom: '2.5rem'
             }}>
-              VISUAL JOURNAL & PORTFOLIO
+              BLOG
             </p>
             
             <h1 style={{ 
@@ -58,8 +58,7 @@ export default function Home() {
                   lineHeight: 1.5,
                   letterSpacing: '-0.02em'
                 }}>
-                  시각적 기록과 코드, 그리고 일상의 조각들을 담아내는 공간입니다. 
-                  단순함의 미학과 본질적인 가치를 탐구합니다.
+                  저의 블로그에 오신걸 환영합니다. 이 곳은 저의 포트폴리오, 일상사진등이 올라오는 곳입니다.
                 </p>
                 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem' }}>

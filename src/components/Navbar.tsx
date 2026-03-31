@@ -20,6 +20,9 @@ export default function Navbar() {
           <li>
             <Link href="/about" className={styles.link}>ABOUT</Link>
           </li>
+          <li>
+            <Link href="/admin" className={styles.link} style={{ opacity: 0.5, fontSize: '0.65rem' }}>MANAGE</Link>
+          </li>
         </ul>
       </div>
     </nav>
