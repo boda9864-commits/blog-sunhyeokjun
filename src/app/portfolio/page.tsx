@@ -8,19 +8,7 @@ interface Project {
 }
 
 const projects: Project[] = [
-  {
-    id: 1,
-    title: 'PROJECT 01',
-    type: 'Visual Experience',
-    description: 'A study in minimalist interface design.'
-  },
-  {
-    id: 2,
-    title: 'PROJECT 02',
-    type: 'Digital Archive',
-    description: 'Documenting the intersection of technology and art.'
-  },
-  // Add more as needed
+  // 여기에 직접 진행하신 프로젝트 정보를 추가하실 수 있습니다.
 ];
 
 export default function PortfolioPage() {
