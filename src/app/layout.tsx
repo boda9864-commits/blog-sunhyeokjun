@@ -3,7 +3,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "JUN | Visual Portfolio",
+  title: "HYEOKJUN | BLOG",
   description: "순혁준의 시각적 기록과 미니멀 포트폴리오입니다.",
 };
 

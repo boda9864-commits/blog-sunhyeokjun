@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import styles from './Portfolio.module.css';
 
 interface Project {
@@ -5,13 +8,20 @@ interface Project {
   title: string;
   type: string;
   description: string;
+  link?: string;
 }
 
-const projects: Project[] = [
-  // 여기에 직접 진행하신 프로젝트 정보를 추가하실 수 있습니다.
-];
-
 export default function PortfolioPage() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/portfolio')
+      .then((r) => r.json())
+      .then((data) => { setProjects(data); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
   return (
     <div className={`${styles.container} container`}>
       <header className={styles.header}>
@@ -23,35 +33,39 @@ export default function PortfolioPage() {
       </header>
 
       <div className={styles.grid}>
-        {projects.map((project) => (
-          <div key={project.id} className={styles.projectCard}>
-            <div className={styles.cardContent}>
-              <p className={styles.projectType}>{project.type}</p>
-              <h3 className={styles.projectTitle}>{project.title}</h3>
-              <p style={{ fontSize: '0.9rem', color: 'rgba(255, 255, 255, 0.6)' }}>
-                {project.description}
-              </p>
+        {loading ? (
+          <p style={{ color: 'var(--foreground-muted)', fontSize: '0.9rem', padding: '3rem 0' }}>
+            불러오는 중...
+          </p>
+        ) : projects.length === 0 ? (
+          <p style={{ color: 'var(--foreground-muted)', fontSize: '0.9rem', padding: '3rem 0', gridColumn: '1/-1' }}>
+            아직 등록된 프로젝트가 없습니다.
+          </p>
+        ) : (
+          projects.map((project) => (
+            <div
+              key={project.id}
+              className={styles.projectCard}
+              style={project.link ? { cursor: 'pointer' } : {}}
+              onClick={() => project.link && window.open(project.link, '_blank')}
+            >
+              <div className={styles.cardContent}>
+                <p className={styles.projectType}>{project.type}</p>
+                <h3 className={styles.projectTitle}>{project.title}</h3>
+                {project.description && (
+                  <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>
+                    {project.description}
+                  </p>
+                )}
+                {project.link && (
+                  <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.75rem', letterSpacing: '1px' }}>
+                    VISIT →
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-        
-        {/* Placeholder for "Add more" */}
-        <div 
-          className={styles.projectCard} 
-          style={{ 
-            borderStyle: 'dashed', 
-            background: 'transparent',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'var(--foreground-muted)'
-          }}
-        >
-          <div style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>+</p>
-            <p style={{ fontSize: '0.75rem', letterSpacing: '2px' }}>NEW PROJECT</p>
-          </div>
-        </div>
+          ))
+        )}
       </div>
     </div>
   );
