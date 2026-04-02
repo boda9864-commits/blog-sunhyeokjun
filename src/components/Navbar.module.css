@@ -4,33 +4,65 @@
   left: 0;
   right: 0;
   z-index: 1000;
-  height: 80px;
+  height: 70px;
   display: flex;
   align-items: center;
-  background: rgba(8, 8, 8, 0.7);
+  background: rgba(8, 8, 8, 0.85);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--glass-border);
 }
 
 .inner {
+  width: 100%;
+}
+
+.navContent {
   display: flex;
-  justify-content: center; /* Center the whole menu for a cleaner editorial look */
+  justify-content: space-between;
   align-items: center;
   width: 100%;
 }
 
+.siteHeader {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  color: var(--primary);
+  z-index: 1001;
+}
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 1001;
+  padding: 10px;
+}
+
+.hamburger span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--primary);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .links {
   display: flex;
-  gap: 3.5rem; /* Perfect identical gap between all words */
+  gap: 3rem;
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.logo, .link {
+.link {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--foreground);
   opacity: 0.6;
   letter-spacing: 2px;
@@ -40,22 +72,54 @@
   cursor: pointer;
 }
 
-.logo:hover, .link:hover {
+.link:hover {
   opacity: 1;
-  color: var(--primary);
 }
 
-.logo::after, .link::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 0;
-  height: 1px;
-  background: var(--primary);
-  transition: width 0.3s ease;
-}
+@media (max-width: 768px) {
+  .hamburger {
+    display: flex;
+  }
 
-.logo:hover::after, .link:hover::after {
-  width: 100%;
+  .hamburger.active span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+  .hamburger.active span:nth-child(2) {
+    opacity: 0;
+  }
+  .hamburger.active span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+
+  .menuOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--background);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1000;
+  }
+
+  .menuVisible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .links {
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+  }
+
+  .link {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
 }
