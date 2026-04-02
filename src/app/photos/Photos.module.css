@@ -1,13 +1,14 @@
 .container {
-  padding: 8rem 0;
+  padding-top: 10rem;
+  padding-bottom: 8rem;
   animation: fadeIn 1s ease-out;
 }
 
 .title {
-  font-size: clamp(2rem, 5vw, 4rem);
+  font-size: clamp(2.5rem, 8vw, 6rem);
   font-weight: 800;
+  letter-spacing: -0.05em;
   margin-bottom: 0.5rem;
-  letter-spacing: -0.04em;
 }
 
 .subtitle {
