@@ -1,43 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-
-const DATA_DIR = path.join(process.cwd(), 'content');
-const JSON_PATH = path.join(DATA_DIR, 'portfolio.json');
-
-function readProjects() {
-  if (!fs.existsSync(JSON_PATH)) return [];
-  return JSON.parse(fs.readFileSync(JSON_PATH, 'utf-8'));
-}
-
-function writeProjects(projects: object[]) {
-  fs.writeFileSync(JSON_PATH, JSON.stringify(projects, null, 2));
-}
+import { sql } from '@vercel/postgres';
 
 // PUT /api/portfolio/[id]
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const body = await req.json();
-  const projects = readProjects();
-  const idx = projects.findIndex((p: { id: number }) => p.id === Number(id));
+  try {
+    const { id } = await params;
+    const body = await req.json();
+    const { title, type, description, link } = body;
 
-  if (idx === -1) return NextResponse.json({ error: '없음' }, { status: 404 });
+    const result = await sql`
+      UPDATE portfolio
+      SET title = COALESCE(${title}, title),
+          type = COALESCE(${type}, type),
+          description = COALESCE(${description}, description),
+          link = COALESCE(${link}, link)
+      WHERE id = ${id}
+      RETURNING *;
+    `;
 
-  projects[idx] = { ...projects[idx], ...body };
-  writeProjects(projects);
-  return NextResponse.json(projects[idx]);
+    if (result.rowCount === 0) {
+      return NextResponse.json({ error: '데이터를 찾을 수 없습니다.' }, { status: 404 });
+    }
+
+    return NextResponse.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error updating portfolio:', error);
+    return NextResponse.json({ error: '업데이트 중 오류가 발생했습니다.' }, { status: 500 });
+  }
 }
 
 // DELETE /api/portfolio/[id]
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const projects = readProjects();
-  const filtered = projects.filter((p: { id: number }) => p.id !== Number(id));
+  try {
+    const { id } = await params;
+    const result = await sql`
+      DELETE FROM portfolio
+      WHERE id = ${id};
+    `;
 
-  if (filtered.length === projects.length) {
-    return NextResponse.json({ error: '없음' }, { status: 404 });
+    if (result.rowCount === 0) {
+      return NextResponse.json({ error: '데이터를 찾을 수 없습니다.' }, { status: 404 });
+    }
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error('Error deleting portfolio:', error);
+    return NextResponse.json({ error: '삭제 중 오류가 발생했습니다.' }, { status: 500 });
   }
-
-  writeProjects(filtered);
-  return NextResponse.json({ ok: true });
 }

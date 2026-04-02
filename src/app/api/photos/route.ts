@@ -1,57 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-
-const PHOTOS_DIR = path.join(process.cwd(), 'public', 'images', 'photos');
-const JSON_PATH = path.join(PHOTOS_DIR, 'photos.json');
-
-function readPhotos() {
-  if (!fs.existsSync(JSON_PATH)) return [];
-  return JSON.parse(fs.readFileSync(JSON_PATH, 'utf-8'));
-}
-
-function writePhotos(photos: object[]) {
-  fs.writeFileSync(JSON_PATH, JSON.stringify(photos, null, 2));
-}
+import { put } from '@vercel/blob';
+import { sql } from '@vercel/postgres';
 
 // GET /api/photos
 export async function GET() {
-  const photos = readPhotos();
-  return NextResponse.json(photos);
+  try {
+    const { rows } = await sql`SELECT * FROM photos ORDER BY created_at DESC`;
+    return NextResponse.json(rows);
+  } catch (error) {
+    console.error('Error fetching photos:', error);
+    return NextResponse.json({ error: '사진을 불러오는 중 오류가 발생했습니다.' }, { status: 500 });
+  }
 }
 
 // POST /api/photos (upload)
 export async function POST(req: NextRequest) {
-  const formData = await req.formData();
-  const file = formData.get('file') as File;
-  const caption = (formData.get('caption') as string) || '';
+  try {
+    const formData = await req.formData();
+    const file = formData.get('file') as File;
+    const caption = (formData.get('caption') as string) || '';
 
-  if (!file) {
-    return NextResponse.json({ error: '파일이 없습니다.' }, { status: 400 });
+    if (!file) {
+      return NextResponse.json({ error: '파일이 없습니다.' }, { status: 400 });
+    }
+
+    // 1. Upload to Vercel Blob
+    const blob = await put(file.name, file, {
+      access: 'public',
+    });
+
+    // 2. Save metadata to Postgres
+    const result = await sql`
+      INSERT INTO photos (filename, url, caption)
+      VALUES (${file.name}, ${blob.url}, ${caption})
+      RETURNING *;
+    `;
+
+    return NextResponse.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error uploading photo:', error);
+    return NextResponse.json({ error: '업로드 중 오류가 발생했습니다.' }, { status: 500 });
   }
-
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-
-  if (!fs.existsSync(PHOTOS_DIR)) {
-    fs.mkdirSync(PHOTOS_DIR, { recursive: true });
-  }
-
-  const filename = file.name;
-  const filepath = path.join(PHOTOS_DIR, filename);
-  fs.writeFileSync(filepath, buffer);
-
-  const photos = readPhotos();
-  const newId = photos.length > 0 ? Math.max(...photos.map((p: {id: number}) => p.id)) + 1 : 1;
-  const newPhoto = {
-    id: newId,
-    filename,
-    url: `/images/photos/${filename}`,
-    caption,
-  };
-
-  photos.push(newPhoto);
-  writePhotos(photos);
-
-  return NextResponse.json(newPhoto);
 }
