@@ -27,8 +27,7 @@ export default function PortfolioPage() {
       <header className={styles.header}>
         <h1 className={styles.title}>PORTFOLIO</h1>
         <p className={styles.subtitle}>
-          개발 프로젝트와 창작물들을 기록하는 공간입니다.<br />
-          본질에 집중한 단순함과 기능의 조화를 탐구합니다.
+          이곳은 제 포트폴리오를 기록하는 공간입니다.
         </p>
       </header>
 

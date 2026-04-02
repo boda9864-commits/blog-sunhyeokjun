@@ -29,10 +29,9 @@ export default function AboutPage() {
           marginTop: '4rem'
         }}>
           <h2 style={{ fontSize: '0.8rem', letterSpacing: '2px', fontWeight: 700, marginBottom: '2rem', color: 'var(--foreground-muted)' }}>
-            CONNECT
+            CONNECT : boda9864@wku.ac.kr
           </h2>
           <p style={{ opacity: 0.6, fontSize: '1rem' }}>
-            새로운 기회와 영감에 대해 이야기하는 것을 좋아합니다.<br/>
             방문해 주셔서 감사합니다.
           </p>
         </div>
