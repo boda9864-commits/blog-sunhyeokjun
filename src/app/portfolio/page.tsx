@@ -18,8 +18,20 @@ export default function PortfolioPage() {
   useEffect(() => {
     fetch('/api/portfolio')
       .then((r) => r.json())
-      .then((data) => { setProjects(data); setLoading(false); })
-      .catch(() => setLoading(false));
+      .then((data) => { 
+        if (Array.isArray(data)) {
+          setProjects(data); 
+        } else {
+          console.error('API Error:', data);
+          setProjects([]);
+        }
+        setLoading(false); 
+      })
+      .catch((err) => {
+        console.error('Fetch Error:', err);
+        setProjects([]);
+        setLoading(false);
+      });
   }, []);
 
   return (
@@ -52,12 +64,12 @@ export default function PortfolioPage() {
                 <p className={styles.projectType}>{project.type}</p>
                 <h3 className={styles.projectTitle}>{project.title}</h3>
                 {project.description && (
-                  <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>
+                  <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.85)' }}>
                     {project.description}
                   </p>
                 )}
                 {project.link && (
-                  <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.75rem', letterSpacing: '1px' }}>
+                  <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.6)', marginTop: '0.75rem', letterSpacing: '1px' }}>
                     VISIT →
                   </p>
                 )}

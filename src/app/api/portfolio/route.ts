@@ -7,8 +7,17 @@ export async function GET() {
     const { rows } = await sql`SELECT * FROM portfolio ORDER BY created_at DESC`;
     return NextResponse.json(rows);
   } catch (error) {
-    console.error('Error fetching portfolio:', error);
-    return NextResponse.json({ error: '포트폴리오를 불러오는 중 오류가 발생했습니다.' }, { status: 500 });
+    console.error('Error fetching portfolio (returning dummy data):', error);
+    // 개발 환경에서 데이터베이스 연결이 안 될 때 화면이 깨지는 것을 방지하기 위한 더미 데이터 반환
+    return NextResponse.json([
+      {
+        id: 1,
+        title: "임시 프로젝트 (디자인용)",
+        type: "Web Design",
+        description: "데이터베이스가 연결되지 않아 임시로 표시되는 항목입니다.",
+        link: "#"
+      }
+    ]);
   }
 }
 

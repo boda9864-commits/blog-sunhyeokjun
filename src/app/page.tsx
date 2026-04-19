@@ -9,76 +9,55 @@ export default function Home() {
         alignItems: 'center',
         padding: '120px 0'
       }}>
-        <div style={{ position: 'relative', width: '100%' }}>
-          {/* Subtle background accent */}
+        <div style={{ position: 'relative', width: '100%', display: 'flex', justifyContent: 'center' }}>
+          
+          {/* Submerged Deep Ocean Glass Card */}
           <div style={{ 
-            position: 'absolute', 
-            top: '-10%', 
-            left: '-5%', 
-            width: '40%', 
-            height: '120%', 
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 100%)',
-            zIndex: -1,
-            borderRadius: '2px'
-          }} />
-
-          <div style={{ maxWidth: '900px' }}>
+            maxWidth: '900px', 
+            width: '100%',
+            padding: '2rem',
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center'
+          }}>
             <p style={{ 
-              fontFamily: 'var(--font-display)',
-              fontSize: '0.75rem', 
-              fontWeight: 600, 
+              fontFamily: 'var(--font-main)',
+              fontSize: '0.85rem', 
+              fontWeight: 500, 
               color: 'var(--foreground-muted)', 
-              letterSpacing: '4px',
+              letterSpacing: '0.2em',
               textTransform: 'uppercase',
-              marginBottom: '2.5rem'
+              marginBottom: '1rem',
+              textShadow: '0 0 10px rgba(0, 180, 216, 0.5)'
             }}>
               BLOG
             </p>
             
             <h1 style={{ 
-              fontSize: 'clamp(4rem, 15vw, 11rem)', 
-              fontWeight: 800, 
-              lineHeight: 0.85, 
-              marginBottom: '4rem',
-              letterSpacing: '-0.06em',
-              marginLeft: '-0.05em'
+              fontSize: 'clamp(3.5rem, 8vw, 6rem)', 
+              fontWeight: 400, 
+              lineHeight: 1.05, 
+              marginBottom: '2rem',
+              letterSpacing: '-0.03em',
+              color: '#ffffff',
+              textShadow: '0 0 40px rgba(0, 180, 216, 0.4), 0 0 20px rgba(144, 224, 239, 0.2)',
             }}>
-              SUNHYEOK<br/>
-              <span style={{ color: 'transparent', WebkitTextStroke: '1px var(--foreground)', opacity: 0.8 }}>JUN</span>
-              <span style={{ color: 'var(--foreground-muted)', fontSize: '0.4em', verticalAlign: 'bottom' }}>.</span>
+              SUNHYEOKJUN
             </h1>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '2rem' }}>
-              <div style={{ gridColumn: 'span 7' }}>
-                <p style={{ 
-                  fontSize: '1.4rem', 
-                  color: 'var(--foreground)', 
-                  marginBottom: '3.5rem',
-                  fontWeight: 300,
-                  lineHeight: 1.5,
-                  letterSpacing: '-0.02em'
-                }}>
-                  저의 블로그에 오신걸 환영합니다. 이 곳은 저의 포트폴리오, 일상사진등이 올라오는 곳입니다.
-                </p>
-                
-                <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem' }}>
-                  <Link href="/portfolio" className="btn-primary">
-                    PORTFOLIO
-                  </Link>
-                  <Link href="/photos" style={{ 
-                    fontFamily: 'var(--font-display)',
-                    fontSize: '0.75rem', 
-                    fontWeight: 700, 
-                    letterSpacing: '2px',
-                    textTransform: 'uppercase',
-                    borderBottom: '1px solid var(--glass-border)',
-                    paddingBottom: '4px'
-                  }}>
-                    VIEW PHOTOS →
-                  </Link>
-                </div>
-              </div>
-            </div>
+            <p style={{ 
+              fontSize: '1.25rem', 
+              color: 'var(--foreground-muted)', 
+              marginBottom: '0',
+              fontWeight: 400,
+              lineHeight: 1.5,
+              maxWidth: '600px',
+              margin: '0 auto'
+            }}>
+              저의 블로그에 오신걸 환영합니다. 이 곳은 저의 포트폴리오, 일상사진, 공부기록등이 올라오는 곳입니다.
+            </p>
           </div>
         </div>
       </section>

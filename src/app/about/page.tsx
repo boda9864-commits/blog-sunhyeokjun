@@ -31,7 +31,7 @@ export default function AboutPage() {
           <h2 style={{ fontSize: '0.8rem', letterSpacing: '2px', fontWeight: 700, marginBottom: '2rem', color: 'var(--foreground-muted)' }}>
             CONNECT : boda9864@wku.ac.kr
           </h2>
-          <p style={{ opacity: 0.6, fontSize: '1rem' }}>
+          <p style={{ opacity: 0.85, fontSize: '1rem' }}>
             방문해 주셔서 감사합니다.
           </p>
         </div>

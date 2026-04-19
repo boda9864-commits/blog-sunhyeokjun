@@ -12,6 +12,9 @@ export default function Navbar() {
             <Link href="/" className={styles.logo}>HOME</Link>
           </li>
           <li>
+            <Link href="/tech" className={styles.link}>TECH STACK</Link>
+          </li>
+          <li>
             <Link href="/portfolio" className={styles.link}>PORTFOLIO</Link>
           </li>
           <li>
