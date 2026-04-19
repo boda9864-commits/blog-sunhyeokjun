@@ -53,3 +53,4 @@ scratch/
 installation_id
 mcp_config.json
 .env*.local
+.mcp.json

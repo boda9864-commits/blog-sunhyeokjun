@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import OceanInteraction from "@/components/OceanInteraction";
 
 export const metadata: Metadata = {
   title: "HYEOKJUN | BLOG",
@@ -18,25 +19,9 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
       <body>
+        <OceanInteraction />
         <div className="bg-mesh">
           <div className="god-rays"></div>
-          
-          {/* Deep Sea Marine Snow Particles */}
-          <div className="marine-snow-container">
-            {[...Array(15)].map((_, i) => (
-              <div 
-                key={i} 
-                className="marine-snow" 
-                style={{
-                  left: `${Math.random() * 100}vw`,
-                  width: `${Math.random() * 2 + 1}px`,
-                  height: `${Math.random() * 2 + 1}px`,
-                  animationDuration: `${Math.random() * 15 + 10}s`,
-                  animationDelay: `${Math.random() * 15}s`
-                }}
-              />
-            ))}
-          </div>
         </div>
         
         {/* Deep sea darkness limited visibility vignette */}
