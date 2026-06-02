@@ -7,17 +7,31 @@ import { sql } from '@vercel/postgres';
 // GET /api/photos
 export async function GET() {
   try {
+    // 1. Try to fetch from Postgres database
+    const { rows } = await sql`SELECT * FROM photos ORDER BY created_at DESC`;
+    if (rows && rows.length > 0) {
+      return NextResponse.json(rows);
+    }
+    
+    // 2. If DB is empty, fall back to the static photos.json file as default/seed data
     const jsonPath = path.join(process.cwd(), 'public', 'images', 'photos', 'photos.json');
     if (fs.existsSync(jsonPath)) {
       const fileContents = fs.readFileSync(jsonPath, 'utf8');
       const photos = JSON.parse(fileContents);
-      // 최신순으로 보여주기
       return NextResponse.json(photos.reverse());
     }
     return NextResponse.json([]);
   } catch (error) {
-    console.error('Error reading photos.json:', error);
-    return NextResponse.json({ error: '사진을 불러오는 중 오류가 발생했습니다.' }, { status: 500 });
+    console.error('Error fetching photos from DB, falling back to photos.json:', error);
+    
+    // 3. Fallback to static photos.json if database connection or query fails
+    const jsonPath = path.join(process.cwd(), 'public', 'images', 'photos', 'photos.json');
+    if (fs.existsSync(jsonPath)) {
+      const fileContents = fs.readFileSync(jsonPath, 'utf8');
+      const photos = JSON.parse(fileContents);
+      return NextResponse.json(photos.reverse());
+    }
+    return NextResponse.json([]);
   }
 }
 
@@ -51,11 +65,12 @@ export async function POST(req: NextRequest) {
     `;
 
     return NextResponse.json(result.rows[0]);
-  } catch (error: any) {
-    console.error('Error in photo upload API:', error);
+  } catch (error) {
+    const err = error as Error;
+    console.error('Error in photo upload API:', err);
     return NextResponse.json({ 
       error: '업로드 중 오류가 발생했습니다.', 
-      details: error.message 
+      details: err.message 
     }, { status: 500 });
   }
 }
