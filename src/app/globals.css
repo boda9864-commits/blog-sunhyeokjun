@@ -1,16 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Inter:wght@300;400;500;600&display=swap');
 
 :root {
-  /* Clear Ocean (Medium Depth) Palette */
-  --background: #006064; /* Deeper teal for medium brightness */
-  --foreground: #ffffff; /* White text for better contrast on deeper colors */
-  --foreground-muted: rgba(255, 255, 255, 0.8);
-  --primary: #4dd0e1;
+  /* Rainy Night Drive Windshield Palette */
+  --background: #070a10; /* Deep asphalt night */
+  --foreground: #f8fafc;
+  --foreground-muted: rgba(203, 213, 225, 0.75);
+  --primary: #38bdf8; /* Cool rain drop blue */
+  --amber-glow: #fbbf24; /* Street light bokeh amber */
   
-  /* Crystal Clear Glass (Higher Contrast) */
-  --glass-bg: rgba(0, 77, 64, 0.4); /* Darker glass tint */
-  --glass-border: rgba(77, 208, 225, 0.3);
-  --glass-highlight: rgba(255, 255, 255, 0.15);
+  /* Rainy Glassmorphism (Smoked Car Window) */
+  --glass-bg: rgba(15, 23, 42, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-highlight: rgba(255, 255, 255, 0.2);
+  --card-bg: rgba(15, 23, 42, 0.45);
   --max-width: 1200px;
   --font-main: 'Inter', -apple-system, sans-serif;
   --font-display: 'Outfit', sans-serif;
@@ -23,7 +25,7 @@
 }
 
 ::selection {
-  background: rgba(82, 161, 196, 0.3);
+  background: rgba(56, 189, 248, 0.3);
   color: #fff;
 }
 
@@ -59,140 +61,121 @@ a {
   z-index: 10;
 }
 
-/* Submerge Entry Animation */
-@keyframes sinkIn {
-  from { opacity: 0; transform: translateY(-40px); filter: blur(15px); }
-  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+/* Atmospheric Fade-in Animation */
+@keyframes windowFadeIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); filter: blur(8px); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
 }
 
 .fade-in {
-  animation: sinkIn 2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+  animation: windowFadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* 
-  DEEP OCEAN GLASS 
+  RAINY CAR WINDOW GLASS (Glassmorphism)
 */
-.liquid-glass {
+.liquid-glass, .rain-glass {
   background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   border: 1px solid var(--glass-border);
   border-top: 1px solid var(--glass-highlight);
   border-radius: 20px;
-  /* Thick shadow representing depth pressure */
-  box-shadow: 0 50px 100px rgba(0, 2, 5, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  transition: transform 1s cubic-bezier(0.1, 0.8, 0.2, 1), box-shadow 1s ease;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s ease;
 }
 
-.liquid-glass:hover {
+.liquid-glass:hover, .rain-glass:hover {
   transform: translateY(-4px);
-  box-shadow: 0 60px 120px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  border-color: rgba(56, 189, 248, 0.3);
 }
 
-.btn-liquid {
+.btn-liquid, .btn-rain {
   position: relative;
   overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 1.1rem 2.8rem;
-  background: rgba(3, 31, 51, 0.6);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(82, 161, 196, 0.2);
+  padding: 1rem 2.5rem;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(56, 189, 248, 0.3);
   border-radius: 100px;
   color: #fff;
   font-family: var(--font-main);
-  font-weight: 400;
-  letter-spacing: 3px;
+  font-weight: 500;
+  letter-spacing: 2px;
   font-size: 0.8rem;
   text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.5s ease;
-  box-shadow: 0 10px 30px rgba(0,2,5,0.8);
+  transition: all 0.4s ease;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
 }
 
-.btn-liquid:hover {
-  background: rgba(5, 42, 69, 0.8);
-  border-color: rgba(82, 161, 196, 0.4);
+.btn-liquid:hover, .btn-rain:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.6);
   transform: translateY(-2px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 1), 0 0 20px rgba(82, 161, 196, 0.1);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7), 0 0 20px rgba(56, 189, 248, 0.2);
 }
 
 .tech-card:hover {
-  background: rgba(255, 255, 255, 0.05) !important;
-  border-color: rgba(82, 161, 196, 0.3) !important;
+  background: rgba(56, 189, 248, 0.08) !important;
+  border-color: rgba(56, 189, 248, 0.4) !important;
   transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
 }
 
-/* Realistic Clear Sea Background (Medium Depth) */
+/* Rainy Night Asphalt Gradient Background */
 .bg-mesh {
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
-  z-index: 0;
+  z-index: -1;
   overflow: hidden;
-  /* Medium brightness turquoise gradient */
-  background: linear-gradient(180deg, #0097a7 0%, #006064 60%, #00363a 100%);
+  background: radial-gradient(circle at 50% 30%, #111827 0%, #080c14 60%, #030508 100%);
 }
 
-/* God Rays / Caustics filtering from above */
-.god-rays {
+/* Ambient Street Mist & Light Diffuse */
+.rain-mist {
   position: absolute;
-  top: -20vh;
-  left: -20vw;
-  width: 140vw;
-  height: 140vh;
-  background: repeating-linear-gradient(
-    15deg,
-    transparent 0%,
-    transparent 3%,
-    rgba(255, 255, 255, 0.1) 5%,
-    rgba(178, 235, 242, 0.15) 6%,
-    transparent 8%,
-    transparent 12%
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(
+    ellipse at 60% 70%,
+    rgba(245, 158, 11, 0.06) 0%,
+    rgba(56, 189, 248, 0.04) 40%,
+    transparent 80%
   );
-  filter: blur(15px);
-  transform-origin: top center;
-  animation: swayRays 22s infinite alternate ease-in-out;
-  opacity: 0.4; /* Reduced brightness */
-  mix-blend-mode: overlay;
+  filter: blur(40px);
   pointer-events: none;
+  animation: mistPulse 8s infinite alternate ease-in-out;
 }
 
-@keyframes swayRays {
-  0% { transform: rotate(-3deg) scale(1); }
-  100% { transform: rotate(3deg) scale(1.1); }
+@keyframes mistPulse {
+  0% { opacity: 0.6; transform: scale(1); }
+  100% { opacity: 0.9; transform: scale(1.05); }
 }
 
-/* Floating Air Bubbles */
-.abyss-vignette {
+/* Windshield Border & Vignette */
+.windshield-vignette {
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
-  box-shadow: inset 0 0 150px rgba(0, 54, 58, 0.4); /* Darker vignette */
+  box-shadow: inset 0 0 140px rgba(0, 0, 0, 0.85);
   pointer-events: none;
   z-index: 1;
 }
 
-.marine-snow-container {
-  position: absolute;
-  top: 0; left: 0; width: 100vw; height: 100vh;
+/* Windshield Upper Tint Bar */
+.windshield-tint {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.8) 0%, rgba(15, 23, 42, 0.2) 60%, transparent 100%);
   pointer-events: none;
-  overflow: hidden;
-}
-
-.marine-snow {
-  position: absolute;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 50%;
-  box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
-  animation: drift 12s infinite linear;
-  opacity: 0;
-}
-
-@keyframes drift {
-  0% { transform: translateY(110vh) translateX(0) scale(0.5); opacity: 0; }
-  10% { opacity: 0.8; }
-  90% { opacity: 0.8; }
-  100% { transform: translateY(-10vh) translateX(40px) scale(1.2); opacity: 0; }
+  z-index: 2;
 }
