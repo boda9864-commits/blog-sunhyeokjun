@@ -26,53 +26,17 @@ export default function Home() {
               textAlign: 'center'
             }}
           >
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 16px',
-              borderRadius: '20px',
-              background: 'rgba(56, 189, 248, 0.12)',
-              border: '1px solid rgba(56, 189, 248, 0.25)',
-              marginBottom: '1.5rem'
-            }}>
-              <span style={{ fontSize: '0.75rem' }}>🌧️</span>
-              <span style={{ 
-                fontFamily: 'var(--font-main)',
-                fontSize: '0.75rem', 
-                fontWeight: 600, 
-                color: 'var(--primary)', 
-                letterSpacing: '0.2em',
-                textTransform: 'uppercase',
-              }}>
-                RAINY WINDSHIELD ARCHIVE
-              </span>
-            </div>
-            
             <h1 style={{ 
               fontSize: 'clamp(3rem, 7vw, 5.5rem)', 
               fontWeight: 700, 
               lineHeight: 1.05, 
-              marginBottom: '1.5rem',
+              marginBottom: '2.5rem',
               letterSpacing: '-0.03em',
               color: '#ffffff',
               textShadow: '0 0 35px rgba(56, 189, 248, 0.35), 0 0 70px rgba(15, 23, 42, 0.9)',
             }}>
               SUNHYEOKJUN
             </h1>
-
-            <p style={{ 
-              fontSize: '1.15rem', 
-              color: 'var(--foreground-muted)', 
-              marginBottom: '2.5rem',
-              fontWeight: 400,
-              lineHeight: 1.7,
-              maxWidth: '580px',
-              margin: '0 auto 2.5rem auto'
-            }}>
-              비 내리는 차창 밖으로 마주하는 생각과 기록들.<br />
-              소프트웨어 개발 여정, 포트폴리오, 그리고 일상의 찰나를 담았습니다.
-            </p>
 
             {/* Quick Navigation Action Buttons */}
             <div style={{
