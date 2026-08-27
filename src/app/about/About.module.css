@@ -1,0 +1,192 @@
+.container {
+  padding: 10rem 0 8rem;
+}
+
+.title {
+  font-size: clamp(2.5rem, 8vw, 6rem);
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 2rem;
+  letter-spacing: -0.05em;
+}
+
+.intro {
+  max-width: 720px;
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: var(--foreground);
+  font-weight: 400;
+  margin-bottom: 5rem;
+}
+
+.gearSection {
+  margin-top: 5rem;
+  border-top: 1px solid var(--glass-border);
+  padding-top: 4rem;
+}
+
+.sectionHeader {
+  margin-bottom: 3.5rem;
+}
+
+.sectionTitle {
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sectionSubtitle {
+  color: var(--foreground-muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.categoryGroup {
+  margin-bottom: 4rem;
+}
+
+.categoryHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.categoryIcon {
+  font-size: 1.25rem;
+}
+
+.categoryTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+.gearGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.gearCard {
+  background: var(--card-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1.75rem;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.gearCard:hover {
+  transform: translateY(-4px);
+  border-color: rgba(56, 189, 248, 0.4);
+  background: rgba(15, 23, 42, 0.65);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(56, 189, 248, 0.08);
+}
+
+.cardTop {
+  margin-bottom: 0;
+}
+
+.roleBadge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.gearName {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.gearSpecs {
+  font-size: 0.82rem;
+  font-family: var(--font-main);
+  color: var(--foreground-muted);
+  line-height: 1.5;
+  margin-bottom: 0;
+  opacity: 0.85;
+}
+
+.gearSpecsList {
+  list-style: none;
+  padding: 0;
+  margin: 0.35rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.gearSpecsList li {
+  font-size: 0.8rem;
+  font-family: var(--font-main);
+  color: var(--foreground-muted);
+  line-height: 1.45;
+  opacity: 0.9;
+}
+
+.contactSection {
+  border-top: 1px solid var(--glass-border);
+  padding-top: 3.5rem;
+  margin-top: 5rem;
+}
+
+.contactLabel {
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--foreground-muted);
+}
+
+.contactEmail {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+.contactEmail:hover {
+  opacity: 0.8;
+}
+
+.contactNote {
+  opacity: 0.85;
+  font-size: 1rem;
+  color: var(--foreground-muted);
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 7rem 0 5rem;
+  }
+
+  .gearGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .gearCard {
+    padding: 1.5rem;
+  }
+}
