@@ -63,7 +63,7 @@ export default function Home() {
               alignItems: 'center',
               gap: '6px'
             }}>
-              <span>💡 화면을 클릭하거나 우측 하단 컨트롤러로 와이퍼를 작동시켜 보세요.</span>
+              <span>💡 우측 하단 컨트롤러로 비소리를 켜거나 볼륨을 조절할 수 있습니다.</span>
             </p>
           </div>
         </div>
