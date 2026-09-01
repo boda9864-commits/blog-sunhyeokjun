@@ -1,6 +1,64 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { animate } from 'animejs';
+
+interface Bokeh {
+  x: number;
+  y: number;
+  radius: number;
+  baseRadius: number;
+  color: string;
+  alpha: number;
+  baseAlpha: number;
+  vx: number;
+  vy: number;
+}
+
+interface RainStreak {
+  x: number;
+  y: number;
+  len: number;
+  speed: number;
+  opacity: number;
+}
+
+interface Ripple {
+  x: number;
+  y: number;
+  radius: number;
+  maxRadius: number;
+  alpha: number;
+}
+
+interface GlassDrop {
+  id: number;
+  x: number;
+  y: number;
+  r: number;
+  scaleX: number;
+  scaleY: number;
+  alpha: number;
+  isSliding: boolean;
+  isWiped?: boolean;
+  vy: number;
+  vx: number;
+  trailTimer: number;
+}
+
+interface TrailPoint {
+  x: number;
+  y: number;
+  r: number;
+  alpha: number;
+}
+
+interface WipeSheen {
+  x: number;
+  y: number;
+  r: number;
+  alpha: number;
+}
 
 export default function RainWindowInteraction() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -105,7 +163,6 @@ export default function RainWindowInteraction() {
         const curCtx = audioCtxRef.current;
         if (curCtx.state !== 'running') return;
 
-        // Create brief random droplet click
         const dropOsc = curCtx.createOscillator();
         const dropGain = curCtx.createGain();
         const dropFilter = curCtx.createBiquadFilter();
@@ -169,27 +226,15 @@ export default function RainWindowInteraction() {
     resize();
 
     // ==========================================
-    // 1. Bokeh Lights (Night Street Lighting)
+    // 1. Anime.js Powered Bokeh Lights (City Reflections)
     // ==========================================
-    interface Bokeh {
-      x: number;
-      y: number;
-      radius: number;
-      color: string;
-      alpha: number;
-      baseAlpha: number;
-      pulseSpeed: number;
-      vx: number;
-      vy: number;
-    }
-
     const bokehs: Bokeh[] = [];
     const bokehColors = [
-      '245, 158, 11',  // Amber street light
-      '239, 68, 68',   // Red brake / tail light
-      '251, 191, 36',  // Warm golden glow
-      '56, 189, 248',  // Cool cyan neon
-      '168, 85, 247',  // Purple street neon
+      '245, 158, 11',  // Warm amber street light
+      '239, 68, 68',   // Red brake tail light
+      '251, 191, 36',  // Golden bokeh
+      '56, 189, 248',  // Cool rain cyan neon
+      '168, 85, 247',  // Purple neon
       '255, 255, 255'  // Bright xenon headlamp
     ];
 
@@ -197,98 +242,207 @@ export default function RainWindowInteraction() {
       bokehs.length = 0;
       const count = Math.max(18, Math.floor((width * height) / 32000));
       for (let i = 0; i < count; i++) {
+        const baseRadius = Math.random() * 55 + 25;
         const baseAlpha = Math.random() * 0.35 + 0.15;
-        bokehs.push({
+        const bokehObj: Bokeh = {
           x: Math.random() * width,
           y: Math.random() * height * 0.85 + height * 0.05,
-          radius: Math.random() * 55 + 25,
+          radius: baseRadius,
+          baseRadius,
           color: bokehColors[Math.floor(Math.random() * bokehColors.length)],
           alpha: baseAlpha,
           baseAlpha,
-          pulseSpeed: Math.random() * 0.02 + 0.008,
           vx: (Math.random() - 0.5) * 0.35,
           vy: (Math.random() - 0.5) * 0.15,
+        };
+        bokehs.push(bokehObj);
+
+        // Anime.js breathing tween for bokeh
+        animate(bokehObj, {
+          radius: [baseRadius * 0.85, baseRadius * 1.2],
+          alpha: [baseAlpha * 0.7, baseAlpha * 1.3],
+          duration: Math.random() * 3000 + 2500,
+          alternate: true,
+          loop: true,
+          ease: 'inOutSine',
+          delay: Math.random() * 1000,
         });
       }
     };
     initBokeh();
 
     // ==========================================
-    // 2. Background Falling Rain Streaks
+    // 2. Background Falling Rain Streaks (Perspective Depth)
     // ==========================================
-    interface RainStreak {
-      x: number;
-      y: number;
-      len: number;
-      speed: number;
-      opacity: number;
-    }
-
     const streaks: RainStreak[] = [];
     const streakCount = 95;
     for (let i = 0; i < streakCount; i++) {
       streaks.push({
         x: Math.random() * (width + 300) - 150,
         y: Math.random() * height,
-        len: Math.random() * 40 + 20,
+        len: Math.random() * 45 + 20,
         speed: Math.random() * 14 + 18,
         opacity: Math.random() * 0.3 + 0.15,
       });
     }
 
     // ==========================================
-    // 3. Windshield Rain Drops
+    // 3. Anime.js Enhanced Windshield Rain Drops & Mouse Wipe
     // ==========================================
-    interface Drop {
-      x: number;
-      y: number;
-      r: number;
-      alpha: number;
-      isSliding: boolean;
-      vy: number;
-      vx: number;
-      trailTimer: number;
-    }
-
-    interface TrailPoint {
-      x: number;
-      y: number;
-      r: number;
-      alpha: number;
-    }
-
-    const drops: Drop[] = [];
+    const drops: GlassDrop[] = [];
     const trails: TrailPoint[] = [];
+    const ripples: Ripple[] = [];
+    const wipeSheens: WipeSheen[] = [];
+    let dropIdCounter = 0;
     const maxDrops = 420;
+
+    const spawnRipple = (x: number, y: number, maxRadius = 18) => {
+      if (ripples.length > 30) ripples.shift();
+      const ripple: Ripple = {
+        x,
+        y,
+        radius: 0,
+        maxRadius,
+        alpha: 0.65,
+      };
+      ripples.push(ripple);
+
+      animate(ripple, {
+        radius: [0, maxRadius],
+        alpha: [0.65, 0],
+        duration: 850,
+        ease: 'outQuad',
+        onComplete: () => {
+          const idx = ripples.indexOf(ripple);
+          if (idx !== -1) ripples.splice(idx, 1);
+        },
+      });
+    };
 
     const spawnDrop = (forcedX?: number, forcedY?: number, isSlide = false) => {
       if (drops.length >= maxDrops) return;
       const x = forcedX !== undefined ? forcedX : Math.random() * width;
       const y = forcedY !== undefined ? forcedY : Math.random() * height;
-      const r = isSlide ? (Math.random() * 2.5 + 3.2) : (Math.random() * 3.5 + 1.2);
-      drops.push({
+      const baseR = isSlide ? (Math.random() * 2.5 + 3.2) : (Math.random() * 3.5 + 1.2);
+      const targetAlpha = Math.random() * 0.35 + 0.65;
+
+      const drop: GlassDrop = {
+        id: ++dropIdCounter,
         x,
         y,
-        r,
-        alpha: Math.random() * 0.4 + 0.6,
+        r: baseR,
+        scaleX: 0,
+        scaleY: 0,
+        alpha: 0,
         isSliding: isSlide,
-        vy: isSlide ? Math.random() * 2 + 1.5 : 0,
+        vy: isSlide ? Math.random() * 2 + 1.4 : 0,
         vx: (Math.random() - 0.5) * 0.3,
         trailTimer: 0,
+      };
+      drops.push(drop);
+
+      // Anime.js Elastic impact landing on glass!
+      animate(drop, {
+        scaleX: [0, 1.25, 1],
+        scaleY: [0, 0.85, 1],
+        alpha: [0, targetAlpha],
+        duration: 450,
+        ease: 'outElastic(1, .5)',
       });
+
+      if (baseR > 2.8) {
+        spawnRipple(x, y, baseR * 3.5);
+      }
     };
 
+    // Initial drops populating glass
     for (let i = 0; i < 280; i++) {
       spawnDrop();
     }
 
     // ==========================================
-    // 4. Main Animation Loop
+    // 4. Mouse / Touch Cursor Wiping Mechanics
     // ==========================================
-    const animate = (currentTime: number) => {
+    const wipeRadius = 52;
+
+    const handlePointerWipe = (px: number, py: number) => {
+      // Add subtle wiping wet sheen ring/glow
+      if (wipeSheens.length < 40) {
+        const sheen: WipeSheen = { x: px, y: py, r: wipeRadius * 0.8, alpha: 0.22 };
+        wipeSheens.push(sheen);
+        animate(sheen, {
+          r: [wipeRadius * 0.8, wipeRadius * 1.15],
+          alpha: [0.22, 0],
+          duration: 600,
+          ease: 'outQuad',
+          onComplete: () => {
+            const idx = wipeSheens.indexOf(sheen);
+            if (idx !== -1) wipeSheens.splice(idx, 1);
+          },
+        });
+      }
+
+      // Check and wipe drops in radius
+      for (let i = drops.length - 1; i >= 0; i--) {
+        const d = drops[i];
+        if (d.isWiped) continue;
+
+        const dx = d.x - px;
+        const dy = d.y - py;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < wipeRadius) {
+          d.isWiped = true;
+          // Anime.js smooth wiping disappearance
+          animate(d, {
+            scaleX: 0,
+            scaleY: 0,
+            alpha: 0,
+            x: d.x + dx * 0.4,
+            y: d.y + dy * 0.4,
+            duration: 220,
+            ease: 'outQuad',
+            onComplete: () => {
+              const idx = drops.indexOf(d);
+              if (idx !== -1) drops.splice(idx, 1);
+            },
+          });
+        }
+      }
+
+      // Wipe trails in radius
+      for (let i = trails.length - 1; i >= 0; i--) {
+        const t = trails[i];
+        const dx = t.x - px;
+        const dy = t.y - py;
+        if (dx * dx + dy * dy < wipeRadius * wipeRadius) {
+          trails.splice(i, 1);
+        }
+      }
+    };
+
+    const onMouseMove = (e: MouseEvent) => {
+      handlePointerWipe(e.clientX, e.clientY);
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches && e.touches[0]) {
+        handlePointerWipe(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    };
+
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+
+    // ==========================================
+    // 5. Main Animation Loop (60fps Canvas Render)
+    // ==========================================
+    const animateLoop = (currentTime: number) => {
       ctx.clearRect(0, 0, width, height);
 
-      // A. Bokeh Lights
+      // ----------------------------------------
+      // A. Render Bokeh Lights
+      // ----------------------------------------
       ctx.save();
       for (let b of bokehs) {
         b.x += b.vx;
@@ -298,21 +452,21 @@ export default function RainWindowInteraction() {
         if (b.y < -60) b.y = height + 60;
         if (b.y > height + 60) b.y = -60;
 
-        b.alpha = b.baseAlpha + Math.sin(currentTime * b.pulseSpeed) * 0.1;
-
-        const gradient = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.radius);
+        const gradient = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, Math.max(1, b.radius));
         gradient.addColorStop(0, `rgba(${b.color}, ${Math.max(0, b.alpha)})`);
         gradient.addColorStop(0.5, `rgba(${b.color}, ${Math.max(0, b.alpha * 0.4)})`);
         gradient.addColorStop(1, `rgba(${b.color}, 0)`);
 
         ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+        ctx.arc(b.x, b.y, Math.max(1, b.radius), 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.restore();
 
-      // B. Falling Rain Streaks
+      // ----------------------------------------
+      // B. Render Falling Rain Streaks
+      // ----------------------------------------
       ctx.save();
       ctx.strokeStyle = 'rgba(186, 230, 253, 0.28)';
       ctx.lineWidth = 1.4;
@@ -332,7 +486,42 @@ export default function RainWindowInteraction() {
       ctx.stroke();
       ctx.restore();
 
-      // C. Spawn & Update Drops
+      // ----------------------------------------
+      // C. Render Water Ripples
+      // ----------------------------------------
+      ctx.save();
+      for (let rip of ripples) {
+        if (rip.alpha > 0.01 && rip.radius > 0) {
+          ctx.strokeStyle = `rgba(186, 230, 253, ${rip.alpha * 0.5})`;
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.ellipse(rip.x, rip.y, rip.radius, rip.radius * 0.65, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+
+      // ----------------------------------------
+      // D. Render Wiped Wet Sheens (Glass Gloss Trail)
+      // ----------------------------------------
+      ctx.save();
+      for (let ws of wipeSheens) {
+        if (ws.alpha > 0.005) {
+          const g = ctx.createRadialGradient(ws.x, ws.y, 0, ws.x, ws.y, ws.r);
+          g.addColorStop(0, `rgba(56, 189, 248, ${ws.alpha * 0.4})`);
+          g.addColorStop(0.7, `rgba(186, 230, 253, ${ws.alpha * 0.15})`);
+          g.addColorStop(1, 'rgba(56, 189, 248, 0)');
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.arc(ws.x, ws.y, ws.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.restore();
+
+      // ----------------------------------------
+      // E. Spawn & Update Drops
+      // ----------------------------------------
       if (Math.random() < 0.65) {
         spawnDrop();
       }
@@ -345,23 +534,27 @@ export default function RainWindowInteraction() {
       for (let i = drops.length - 1; i >= 0; i--) {
         const d = drops[i];
 
-        // Sliding physics
-        if (d.isSliding) {
+        // Sliding physics with surface tension stretch
+        if (d.isSliding && !d.isWiped) {
           d.y += d.vy;
           d.x += d.vx;
           d.vy += 0.035;
           d.trailTimer++;
 
+          d.scaleY = Math.min(1.6, 1 + d.vy * 0.08);
+          d.scaleX = Math.max(0.75, 1 - d.vy * 0.04);
+
           if (d.trailTimer % 3 === 0 && trails.length < 320) {
             trails.push({
               x: d.x + (Math.random() - 0.5) * 1.5,
               y: d.y - d.r * 1.2,
-              r: d.r * 0.4,
+              r: d.r * 0.38,
               alpha: d.alpha * 0.75,
             });
           }
 
           if (d.y > height + 25) {
+            spawnRipple(d.x, height - 10, d.r * 3);
             drops.splice(i, 1);
             continue;
           }
@@ -377,50 +570,60 @@ export default function RainWindowInteraction() {
         }
       }
 
-      // D. Render Trails
+      // ----------------------------------------
+      // F. Render Trails
+      // ----------------------------------------
       ctx.save();
       for (let t of trails) {
         ctx.fillStyle = `rgba(224, 242, 254, ${t.alpha})`;
         ctx.beginPath();
-        ctx.arc(t.x, t.y, t.r, 0, Math.PI * 2);
+        ctx.arc(t.x, t.y, Math.max(0.5, t.r), 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.restore();
 
-      // E. Render Windshield Drops
+      // ----------------------------------------
+      // G. Render Windshield Drops (Refraction & Highlights)
+      // ----------------------------------------
       ctx.save();
       for (let d of drops) {
+        if (d.alpha <= 0.01 || d.scaleX <= 0) continue;
+
+        const effectiveR = d.r;
+        const rx = effectiveR * d.scaleX;
+        const ry = effectiveR * d.scaleY;
+
         // Drop base body
         ctx.fillStyle = `rgba(186, 230, 253, ${d.alpha * 0.3})`;
         ctx.beginPath();
-        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+        ctx.ellipse(d.x, d.y, rx, ry, 0, 0, Math.PI * 2);
         ctx.fill();
 
         // Dark outline shadow for refraction
-        ctx.strokeStyle = `rgba(2, 6, 23, ${d.alpha * 0.6})`;
+        ctx.strokeStyle = `rgba(2, 6, 23, ${d.alpha * 0.65})`;
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+        ctx.ellipse(d.x, d.y, rx, ry, 0, 0, Math.PI * 2);
         ctx.stroke();
 
         // Bright specular top-left gleam
         ctx.fillStyle = `rgba(255, 255, 255, ${d.alpha * 0.95})`;
         ctx.beginPath();
-        ctx.arc(d.x - d.r * 0.35, d.y - d.r * 0.35, Math.max(0.7, d.r * 0.35), 0, Math.PI * 2);
+        ctx.ellipse(d.x - rx * 0.35, d.y - ry * 0.35, Math.max(0.7, rx * 0.35), Math.max(0.7, ry * 0.35), 0, 0, Math.PI * 2);
         ctx.fill();
 
         // Ambient bottom-right glow
         ctx.fillStyle = `rgba(224, 242, 254, ${d.alpha * 0.5})`;
         ctx.beginPath();
-        ctx.arc(d.x + d.r * 0.25, d.y + d.r * 0.25, Math.max(0.5, d.r * 0.22), 0, Math.PI * 2);
+        ctx.ellipse(d.x + rx * 0.25, d.y + ry * 0.25, Math.max(0.5, rx * 0.22), Math.max(0.5, ry * 0.22), 0, 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.restore();
 
-      animId = requestAnimationFrame(animate);
+      animId = requestAnimationFrame(animateLoop);
     };
 
-    animId = requestAnimationFrame(animate);
+    animId = requestAnimationFrame(animateLoop);
 
     const handleResize = () => {
       resize();
@@ -432,6 +635,8 @@ export default function RainWindowInteraction() {
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('touchmove', onTouchMove);
       if (patterIntervalRef.current) {
         clearInterval(patterIntervalRef.current);
       }
