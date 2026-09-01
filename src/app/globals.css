@@ -127,13 +127,50 @@ a {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
 }
 
-/* Rainy Night Asphalt Gradient Background */
+/* Rainy Night Asphalt Gradient Background (Theme 1) */
 .bg-mesh {
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
-  z-index: -1;
+  z-index: 0;
   overflow: hidden;
   background: radial-gradient(circle at 50% 30%, #111827 0%, #080c14 60%, #030508 100%);
+  transition: opacity 0.8s ease;
+}
+
+/* Sunny Grass Hill Background (Theme 2) */
+.bg-hill-layer {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  z-index: 0;
+  background-image: url('/images/bg-hill.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  transition: opacity 0.8s ease;
+}
+
+.bg-hill-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: radial-gradient(circle at 50% 30%, rgba(15, 23, 42, 0.05) 0%, rgba(15, 23, 42, 0.25) 100%);
+}
+
+/* Starry Mountain Background (Theme 3) */
+.bg-mountain-layer {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  z-index: 0;
+  background-image: url('/images/bg-mountain.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  transition: opacity 0.8s ease;
+}
+
+.bg-mountain-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: radial-gradient(circle at 50% 40%, rgba(15, 23, 42, 0.1) 0%, rgba(15, 23, 42, 0.4) 100%);
 }
 
 /* Ambient Street Mist & Light Diffuse */
@@ -166,6 +203,7 @@ a {
   box-shadow: inset 0 0 140px rgba(0, 0, 0, 0.85);
   pointer-events: none;
   z-index: 1;
+  transition: opacity 0.8s ease;
 }
 
 /* Windshield Upper Tint Bar */
@@ -178,4 +216,5 @@ a {
   background: linear-gradient(180deg, rgba(15, 23, 42, 0.8) 0%, rgba(15, 23, 42, 0.2) 60%, transparent 100%);
   pointer-events: none;
   z-index: 2;
+  transition: opacity 0.8s ease;
 }

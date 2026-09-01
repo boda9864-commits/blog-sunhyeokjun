@@ -19,17 +19,8 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
       <body>
-        {/* Rainy Windshield Canvas & Wiper Mechanism */}
+        {/* Interactive Backgrounds & Rain Interaction */}
         <RainWindowInteraction />
-        
-        {/* Night Drive Ambient Background & Mist */}
-        <div className="bg-mesh">
-          <div className="rain-mist"></div>
-        </div>
-        
-        {/* Car Windshield Frame Vignette & Tint */}
-        <div className="windshield-vignette"></div>
-        <div className="windshield-tint"></div>
 
         <Navbar />
         <main style={{ minHeight: '100vh', position: 'relative', zIndex: 10 }}>

@@ -3,6 +3,8 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { animate } from 'animejs';
 
+type BgTheme = 'rain' | 'hill' | 'mountain';
+
 interface Bokeh {
   x: number;
   y: number;
@@ -62,6 +64,43 @@ interface WipeSheen {
 
 export default function RainWindowInteraction() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // ==========================================
+  // Background Theme State (Theme 1: Rain vs Theme 2: Hill vs Theme 3: Mountain)
+  // ==========================================
+  const [bgTheme, setBgTheme] = useState<BgTheme>('rain');
+  const [bgMenuOpen, setBgMenuOpen] = useState(false);
+  const bgThemeRef = useRef<BgTheme>('rain');
+
+  useEffect(() => {
+    bgThemeRef.current = bgTheme;
+  }, [bgTheme]);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('blog_bg_theme') as BgTheme;
+      if (saved === 'rain' || saved === 'hill' || saved === 'mountain') {
+        setBgTheme(saved);
+        bgThemeRef.current = saved;
+      }
+    } catch {
+      // Ignore localStorage error
+    }
+  }, []);
+
+  const changeBgTheme = (theme: BgTheme) => {
+    setBgTheme(theme);
+    bgThemeRef.current = theme;
+    setBgMenuOpen(false);
+    try {
+      localStorage.setItem('blog_bg_theme', theme);
+    } catch {}
+
+    // If switching away from rain, stop rain sound
+    if (theme !== 'rain' && isAudioPlayingRef.current) {
+      stopRainSound();
+    }
+  };
 
   // ==========================================
   // Audio State (Rain Sound & Volume Knob)
@@ -198,6 +237,9 @@ export default function RainWindowInteraction() {
     if (isAudioPlaying) {
       stopRainSound();
     } else {
+      if (bgTheme !== 'rain') {
+        changeBgTheme('rain');
+      }
       startRainSound();
     }
   };
@@ -257,7 +299,6 @@ export default function RainWindowInteraction() {
         };
         bokehs.push(bokehObj);
 
-        // Anime.js breathing tween for bokeh
         animate(bokehObj, {
           radius: [baseRadius * 0.85, baseRadius * 1.2],
           alpha: [baseAlpha * 0.7, baseAlpha * 1.3],
@@ -272,7 +313,7 @@ export default function RainWindowInteraction() {
     initBokeh();
 
     // ==========================================
-    // 2. Background Falling Rain Streaks (Perspective Depth)
+    // 2. Background Falling Rain Streaks
     // ==========================================
     const streaks: RainStreak[] = [];
     const streakCount = 95;
@@ -341,7 +382,6 @@ export default function RainWindowInteraction() {
       };
       drops.push(drop);
 
-      // Anime.js Elastic impact landing on glass!
       animate(drop, {
         scaleX: [0, 1.25, 1],
         scaleY: [0, 0.85, 1],
@@ -355,7 +395,6 @@ export default function RainWindowInteraction() {
       }
     };
 
-    // Initial drops populating glass
     for (let i = 0; i < 280; i++) {
       spawnDrop();
     }
@@ -366,7 +405,8 @@ export default function RainWindowInteraction() {
     const wipeRadius = 52;
 
     const handlePointerWipe = (px: number, py: number) => {
-      // Add subtle wiping wet sheen ring/glow
+      if (bgThemeRef.current !== 'rain') return;
+
       if (wipeSheens.length < 40) {
         const sheen: WipeSheen = { x: px, y: py, r: wipeRadius * 0.8, alpha: 0.22 };
         wipeSheens.push(sheen);
@@ -382,7 +422,6 @@ export default function RainWindowInteraction() {
         });
       }
 
-      // Check and wipe drops in radius
       for (let i = drops.length - 1; i >= 0; i--) {
         const d = drops[i];
         if (d.isWiped) continue;
@@ -393,7 +432,6 @@ export default function RainWindowInteraction() {
 
         if (dist < wipeRadius) {
           d.isWiped = true;
-          // Anime.js smooth wiping disappearance
           animate(d, {
             scaleX: 0,
             scaleY: 0,
@@ -410,7 +448,6 @@ export default function RainWindowInteraction() {
         }
       }
 
-      // Wipe trails in radius
       for (let i = trails.length - 1; i >= 0; i--) {
         const t = trails[i];
         const dx = t.x - px;
@@ -440,185 +477,167 @@ export default function RainWindowInteraction() {
     const animateLoop = (currentTime: number) => {
       ctx.clearRect(0, 0, width, height);
 
-      // ----------------------------------------
-      // A. Render Bokeh Lights
-      // ----------------------------------------
-      ctx.save();
-      for (let b of bokehs) {
-        b.x += b.vx;
-        b.y += b.vy;
-        if (b.x < -60) b.x = width + 60;
-        if (b.x > width + 60) b.x = -60;
-        if (b.y < -60) b.y = height + 60;
-        if (b.y > height + 60) b.y = -60;
+      // Only render rain elements if Theme 1 is active
+      if (bgThemeRef.current === 'rain') {
+        // A. Render Bokeh Lights
+        ctx.save();
+        for (let b of bokehs) {
+          b.x += b.vx;
+          b.y += b.vy;
+          if (b.x < -60) b.x = width + 60;
+          if (b.x > width + 60) b.x = -60;
+          if (b.y < -60) b.y = height + 60;
+          if (b.y > height + 60) b.y = -60;
 
-        const gradient = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, Math.max(1, b.radius));
-        gradient.addColorStop(0, `rgba(${b.color}, ${Math.max(0, b.alpha)})`);
-        gradient.addColorStop(0.5, `rgba(${b.color}, ${Math.max(0, b.alpha * 0.4)})`);
-        gradient.addColorStop(1, `rgba(${b.color}, 0)`);
+          const gradient = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, Math.max(1, b.radius));
+          gradient.addColorStop(0, `rgba(${b.color}, ${Math.max(0, b.alpha)})`);
+          gradient.addColorStop(0.5, `rgba(${b.color}, ${Math.max(0, b.alpha * 0.4)})`);
+          gradient.addColorStop(1, `rgba(${b.color}, 0)`);
 
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(b.x, b.y, Math.max(1, b.radius), 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.restore();
-
-      // ----------------------------------------
-      // B. Render Falling Rain Streaks
-      // ----------------------------------------
-      ctx.save();
-      ctx.strokeStyle = 'rgba(186, 230, 253, 0.28)';
-      ctx.lineWidth = 1.4;
-      ctx.beginPath();
-      for (let s of streaks) {
-        s.y += s.speed;
-        s.x -= s.speed * 0.18;
-
-        if (s.y > height + 50 || s.x < -60) {
-          s.y = -40;
-          s.x = Math.random() * (width + 300) - 100;
-        }
-
-        ctx.moveTo(s.x, s.y);
-        ctx.lineTo(s.x - s.len * 0.18, s.y + s.len);
-      }
-      ctx.stroke();
-      ctx.restore();
-
-      // ----------------------------------------
-      // C. Render Water Ripples
-      // ----------------------------------------
-      ctx.save();
-      for (let rip of ripples) {
-        if (rip.alpha > 0.01 && rip.radius > 0) {
-          ctx.strokeStyle = `rgba(186, 230, 253, ${rip.alpha * 0.5})`;
-          ctx.lineWidth = 1.2;
+          ctx.fillStyle = gradient;
           ctx.beginPath();
-          ctx.ellipse(rip.x, rip.y, rip.radius, rip.radius * 0.65, 0, 0, Math.PI * 2);
-          ctx.stroke();
-        }
-      }
-      ctx.restore();
-
-      // ----------------------------------------
-      // D. Render Wiped Wet Sheens (Glass Gloss Trail)
-      // ----------------------------------------
-      ctx.save();
-      for (let ws of wipeSheens) {
-        if (ws.alpha > 0.005) {
-          const g = ctx.createRadialGradient(ws.x, ws.y, 0, ws.x, ws.y, ws.r);
-          g.addColorStop(0, `rgba(56, 189, 248, ${ws.alpha * 0.4})`);
-          g.addColorStop(0.7, `rgba(186, 230, 253, ${ws.alpha * 0.15})`);
-          g.addColorStop(1, 'rgba(56, 189, 248, 0)');
-          ctx.fillStyle = g;
-          ctx.beginPath();
-          ctx.arc(ws.x, ws.y, ws.r, 0, Math.PI * 2);
+          ctx.arc(b.x, b.y, Math.max(1, b.radius), 0, Math.PI * 2);
           ctx.fill();
         }
-      }
-      ctx.restore();
+        ctx.restore();
 
-      // ----------------------------------------
-      // E. Spawn & Update Drops
-      // ----------------------------------------
-      if (Math.random() < 0.65) {
-        spawnDrop();
-      }
+        // B. Render Falling Rain Streaks
+        ctx.save();
+        ctx.strokeStyle = 'rgba(186, 230, 253, 0.28)';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        for (let s of streaks) {
+          s.y += s.speed;
+          s.x -= s.speed * 0.18;
 
-      // Continuous natural sliding drops
-      if (Math.random() < 0.05) {
-        spawnDrop(undefined, Math.random() * height * 0.35, true);
-      }
-
-      for (let i = drops.length - 1; i >= 0; i--) {
-        const d = drops[i];
-
-        // Sliding physics with surface tension stretch
-        if (d.isSliding && !d.isWiped) {
-          d.y += d.vy;
-          d.x += d.vx;
-          d.vy += 0.035;
-          d.trailTimer++;
-
-          d.scaleY = Math.min(1.6, 1 + d.vy * 0.08);
-          d.scaleX = Math.max(0.75, 1 - d.vy * 0.04);
-
-          if (d.trailTimer % 3 === 0 && trails.length < 320) {
-            trails.push({
-              x: d.x + (Math.random() - 0.5) * 1.5,
-              y: d.y - d.r * 1.2,
-              r: d.r * 0.38,
-              alpha: d.alpha * 0.75,
-            });
+          if (s.y > height + 50 || s.x < -60) {
+            s.y = -40;
+            s.x = Math.random() * (width + 300) - 100;
           }
 
-          if (d.y > height + 25) {
-            spawnRipple(d.x, height - 10, d.r * 3);
-            drops.splice(i, 1);
-            continue;
-          }
+          ctx.moveTo(s.x, s.y);
+          ctx.lineTo(s.x - s.len * 0.18, s.y + s.len);
         }
-      }
-
-      // Update trails
-      for (let i = trails.length - 1; i >= 0; i--) {
-        const t = trails[i];
-        t.alpha -= 0.0035;
-        if (t.alpha <= 0) {
-          trails.splice(i, 1);
-        }
-      }
-
-      // ----------------------------------------
-      // F. Render Trails
-      // ----------------------------------------
-      ctx.save();
-      for (let t of trails) {
-        ctx.fillStyle = `rgba(224, 242, 254, ${t.alpha})`;
-        ctx.beginPath();
-        ctx.arc(t.x, t.y, Math.max(0.5, t.r), 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.restore();
-
-      // ----------------------------------------
-      // G. Render Windshield Drops (Refraction & Highlights)
-      // ----------------------------------------
-      ctx.save();
-      for (let d of drops) {
-        if (d.alpha <= 0.01 || d.scaleX <= 0) continue;
-
-        const effectiveR = d.r;
-        const rx = effectiveR * d.scaleX;
-        const ry = effectiveR * d.scaleY;
-
-        // Drop base body
-        ctx.fillStyle = `rgba(186, 230, 253, ${d.alpha * 0.3})`;
-        ctx.beginPath();
-        ctx.ellipse(d.x, d.y, rx, ry, 0, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Dark outline shadow for refraction
-        ctx.strokeStyle = `rgba(2, 6, 23, ${d.alpha * 0.65})`;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.ellipse(d.x, d.y, rx, ry, 0, 0, Math.PI * 2);
         ctx.stroke();
+        ctx.restore();
 
-        // Bright specular top-left gleam
-        ctx.fillStyle = `rgba(255, 255, 255, ${d.alpha * 0.95})`;
-        ctx.beginPath();
-        ctx.ellipse(d.x - rx * 0.35, d.y - ry * 0.35, Math.max(0.7, rx * 0.35), Math.max(0.7, ry * 0.35), 0, 0, Math.PI * 2);
-        ctx.fill();
+        // C. Render Water Ripples
+        ctx.save();
+        for (let rip of ripples) {
+          if (rip.alpha > 0.01 && rip.radius > 0) {
+            ctx.strokeStyle = `rgba(186, 230, 253, ${rip.alpha * 0.5})`;
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.ellipse(rip.x, rip.y, rip.radius, rip.radius * 0.65, 0, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+        }
+        ctx.restore();
 
-        // Ambient bottom-right glow
-        ctx.fillStyle = `rgba(224, 242, 254, ${d.alpha * 0.5})`;
-        ctx.beginPath();
-        ctx.ellipse(d.x + rx * 0.25, d.y + ry * 0.25, Math.max(0.5, rx * 0.22), Math.max(0.5, ry * 0.22), 0, 0, Math.PI * 2);
-        ctx.fill();
+        // D. Render Wiped Wet Sheens
+        ctx.save();
+        for (let ws of wipeSheens) {
+          if (ws.alpha > 0.005) {
+            const g = ctx.createRadialGradient(ws.x, ws.y, 0, ws.x, ws.y, ws.r);
+            g.addColorStop(0, `rgba(56, 189, 248, ${ws.alpha * 0.4})`);
+            g.addColorStop(0.7, `rgba(186, 230, 253, ${ws.alpha * 0.15})`);
+            g.addColorStop(1, 'rgba(56, 189, 248, 0)');
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.arc(ws.x, ws.y, ws.r, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+        ctx.restore();
+
+        // E. Spawn & Update Drops
+        if (Math.random() < 0.65) {
+          spawnDrop();
+        }
+
+        if (Math.random() < 0.05) {
+          spawnDrop(undefined, Math.random() * height * 0.35, true);
+        }
+
+        for (let i = drops.length - 1; i >= 0; i--) {
+          const d = drops[i];
+
+          if (d.isSliding && !d.isWiped) {
+            d.y += d.vy;
+            d.x += d.vx;
+            d.vy += 0.035;
+            d.trailTimer++;
+
+            d.scaleY = Math.min(1.6, 1 + d.vy * 0.08);
+            d.scaleX = Math.max(0.75, 1 - d.vy * 0.04);
+
+            if (d.trailTimer % 3 === 0 && trails.length < 320) {
+              trails.push({
+                x: d.x + (Math.random() - 0.5) * 1.5,
+                y: d.y - d.r * 1.2,
+                r: d.r * 0.38,
+                alpha: d.alpha * 0.75,
+              });
+            }
+
+            if (d.y > height + 25) {
+              spawnRipple(d.x, height - 10, d.r * 3);
+              drops.splice(i, 1);
+              continue;
+            }
+          }
+        }
+
+        for (let i = trails.length - 1; i >= 0; i--) {
+          const t = trails[i];
+          t.alpha -= 0.0035;
+          if (t.alpha <= 0) {
+            trails.splice(i, 1);
+          }
+        }
+
+        // F. Render Trails
+        ctx.save();
+        for (let t of trails) {
+          ctx.fillStyle = `rgba(224, 242, 254, ${t.alpha})`;
+          ctx.beginPath();
+          ctx.arc(t.x, t.y, Math.max(0.5, t.r), 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+
+        // G. Render Windshield Drops
+        ctx.save();
+        for (let d of drops) {
+          if (d.alpha <= 0.01 || d.scaleX <= 0) continue;
+
+          const effectiveR = d.r;
+          const rx = effectiveR * d.scaleX;
+          const ry = effectiveR * d.scaleY;
+
+          ctx.fillStyle = `rgba(186, 230, 253, ${d.alpha * 0.3})`;
+          ctx.beginPath();
+          ctx.ellipse(d.x, d.y, rx, ry, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.strokeStyle = `rgba(2, 6, 23, ${d.alpha * 0.65})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.ellipse(d.x, d.y, rx, ry, 0, 0, Math.PI * 2);
+          ctx.stroke();
+
+          ctx.fillStyle = `rgba(255, 255, 255, ${d.alpha * 0.95})`;
+          ctx.beginPath();
+          ctx.ellipse(d.x - rx * 0.35, d.y - ry * 0.35, Math.max(0.7, rx * 0.35), Math.max(0.7, ry * 0.35), 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = `rgba(224, 242, 254, ${d.alpha * 0.5})`;
+          ctx.beginPath();
+          ctx.ellipse(d.x + rx * 0.25, d.y + ry * 0.25, Math.max(0.5, rx * 0.22), Math.max(0.5, ry * 0.22), 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
       }
-      ctx.restore();
 
       animId = requestAnimationFrame(animateLoop);
     };
@@ -648,7 +667,61 @@ export default function RainWindowInteraction() {
 
   return (
     <>
-      {/* Interactive Windshield & Rain Canvas */}
+      {/* Background 1: Dark Asphalt Night Mesh & Mist Layer */}
+      <div
+        className="bg-mesh"
+        style={{
+          opacity: bgTheme === 'rain' ? 1 : 0,
+          pointerEvents: 'none',
+          transition: 'opacity 0.7s ease',
+        }}
+      >
+        <div className="rain-mist" />
+      </div>
+
+      {/* Background 2: Sunny Hill Image Layer */}
+      <div
+        className="bg-hill-layer"
+        style={{
+          opacity: bgTheme === 'hill' ? 1 : 0,
+          pointerEvents: 'none',
+          transition: 'opacity 0.7s ease',
+        }}
+      >
+        <div className="bg-hill-overlay" />
+      </div>
+
+      {/* Background 3: Starry Mountain Image Layer */}
+      <div
+        className="bg-mountain-layer"
+        style={{
+          opacity: bgTheme === 'mountain' ? 1 : 0,
+          pointerEvents: 'none',
+          transition: 'opacity 0.7s ease',
+        }}
+      >
+        <div className="bg-mountain-overlay" />
+      </div>
+
+      {/* Windshield Frame Vignette & Tint (Theme 1 Rain only) */}
+      <div
+        className="windshield-vignette"
+        style={{
+          opacity: bgTheme === 'rain' ? 1 : 0,
+          pointerEvents: 'none',
+          transition: 'opacity 0.7s ease',
+        }}
+      />
+      <div
+        className="windshield-tint"
+        style={{
+          opacity: bgTheme === 'rain' ? 1 : 0,
+          pointerEvents: 'none',
+          transition: 'opacity 0.7s ease',
+        }}
+      />
+
+      {/* Interactive Windshield & Rain Canvas (Active in Theme 1) */}
       <canvas
         ref={canvasRef}
         style={{
@@ -659,10 +732,12 @@ export default function RainWindowInteraction() {
           height: '100%',
           zIndex: 1,
           pointerEvents: 'none',
+          opacity: bgTheme === 'rain' ? 1 : 0,
+          transition: 'opacity 0.7s ease',
         }}
       />
 
-      {/* Ambient Rain Sound HUD Control */}
+      {/* Cockpit HUD Controller (Theme Switcher + Rain Sound + Volume Knob) */}
       <div
         className="cockpit-hud"
         style={{
@@ -677,7 +752,7 @@ export default function RainWindowInteraction() {
           fontFamily: 'var(--font-main)',
         }}
       >
-        {/* Main Sound Bar */}
+        {/* Main Dock Bar */}
         <div
           style={{
             display: 'flex',
@@ -693,6 +768,43 @@ export default function RainWindowInteraction() {
             transition: 'all 0.3s ease',
           }}
         >
+          {/* Background Theme Selector Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setBgMenuOpen(!bgMenuOpen);
+              setAudioExpanded(false);
+            }}
+            style={{
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              color: '#ffffff',
+              borderRadius: '20px',
+              padding: '6px 12px',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              letterSpacing: '0.5px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.25s ease',
+            }}
+            title="배경화면 변경"
+          >
+            <span>{bgTheme === 'rain' ? '🌧️' : bgTheme === 'hill' ? '🌳' : '🌌'}</span>
+            <span>
+              {bgTheme === 'rain'
+                ? '배경 1 (빗길)'
+                : bgTheme === 'hill'
+                ? '배경 2 (초원)'
+                : '배경 3 (설산)'}
+            </span>
+            <span style={{ fontSize: '0.6rem', opacity: 0.7 }}>{bgMenuOpen ? '▲' : '▼'}</span>
+          </button>
+
+          <div style={{ width: '1px', height: '18px', background: 'rgba(255, 255, 255, 0.15)' }} />
+
           {/* Rain Sound Toggle */}
           <button
             onClick={(e) => {
@@ -704,7 +816,7 @@ export default function RainWindowInteraction() {
               border: isAudioPlaying ? '1px solid rgba(56, 189, 248, 0.6)' : '1px solid rgba(255, 255, 255, 0.15)',
               color: isAudioPlaying ? '#38bdf8' : 'rgba(255, 255, 255, 0.65)',
               borderRadius: '20px',
-              padding: '6px 14px',
+              padding: '6px 12px',
               fontSize: '0.75rem',
               fontWeight: 600,
               letterSpacing: '0.5px',
@@ -730,20 +842,19 @@ export default function RainWindowInteraction() {
             )}
           </button>
 
-          <div style={{ width: '1px', height: '18px', background: 'rgba(255, 255, 255, 0.15)' }} />
-
-          {/* Volume Knob Panel Toggle */}
+          {/* Volume Knob Toggle */}
           <button
             onClick={(e) => {
               e.stopPropagation();
               setAudioExpanded(!audioExpanded);
+              setBgMenuOpen(false);
             }}
             style={{
               background: audioExpanded ? 'rgba(56, 189, 248, 0.2)' : 'transparent',
               border: audioExpanded ? '1px solid rgba(56, 189, 248, 0.4)' : '1px solid transparent',
               borderRadius: '50%',
-              width: '30px',
-              height: '30px',
+              width: '28px',
+              height: '28px',
               color: audioExpanded ? '#38bdf8' : 'rgba(255, 255, 255, 0.75)',
               fontSize: '0.85rem',
               cursor: 'pointer',
@@ -757,6 +868,104 @@ export default function RainWindowInteraction() {
             🎛️
           </button>
         </div>
+
+        {/* Background Switcher Menu Popover */}
+        {bgMenuOpen && (
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: 'rgba(15, 23, 42, 0.95)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              borderRadius: '18px',
+              padding: '10px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px',
+              boxShadow: '0 12px 40px rgba(0, 0, 0, 0.75)',
+              minWidth: '200px',
+            }}
+          >
+            <span style={{ fontSize: '0.7rem', fontWeight: 600, color: 'rgba(255, 255, 255, 0.5)', padding: '4px 8px', letterSpacing: '0.5px' }}>
+              BACKGROUND THEME
+            </span>
+
+            {/* Option 1: Rain Window */}
+            <button
+              onClick={() => changeBgTheme('rain')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '8px 12px',
+                borderRadius: '10px',
+                background: bgTheme === 'rain' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                border: bgTheme === 'rain' ? '1px solid rgba(56, 189, 248, 0.5)' : '1px solid transparent',
+                color: bgTheme === 'rain' ? '#38bdf8' : '#ffffff',
+                cursor: 'pointer',
+                fontSize: '0.78rem',
+                fontWeight: 500,
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>🌧️</span>
+                <span>배경화면 1 (빗길 차창)</span>
+              </div>
+              {bgTheme === 'rain' && <span style={{ fontSize: '0.75rem' }}>✓</span>}
+            </button>
+
+            {/* Option 2: Sunny Hill */}
+            <button
+              onClick={() => changeBgTheme('hill')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '8px 12px',
+                borderRadius: '10px',
+                background: bgTheme === 'hill' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                border: bgTheme === 'hill' ? '1px solid rgba(56, 189, 248, 0.5)' : '1px solid transparent',
+                color: bgTheme === 'hill' ? '#38bdf8' : '#ffffff',
+                cursor: 'pointer',
+                fontSize: '0.78rem',
+                fontWeight: 500,
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>🌳</span>
+                <span>배경화면 2 (푸른 언덕)</span>
+              </div>
+              {bgTheme === 'hill' && <span style={{ fontSize: '0.75rem' }}>✓</span>}
+            </button>
+
+            {/* Option 3: Starry Mountain */}
+            <button
+              onClick={() => changeBgTheme('mountain')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '8px 12px',
+                borderRadius: '10px',
+                background: bgTheme === 'mountain' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                border: bgTheme === 'mountain' ? '1px solid rgba(56, 189, 248, 0.5)' : '1px solid transparent',
+                color: bgTheme === 'mountain' ? '#38bdf8' : '#ffffff',
+                cursor: 'pointer',
+                fontSize: '0.78rem',
+                fontWeight: 500,
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>🌌</span>
+                <span>배경화면 3 (별밤 설산)</span>
+              </div>
+              {bgTheme === 'mountain' && <span style={{ fontSize: '0.75rem' }}>✓</span>}
+            </button>
+          </div>
+        )}
 
         {/* Volume Knob Panel Popover */}
         {audioExpanded && (
